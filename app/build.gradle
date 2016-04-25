@@ -1,0 +1,35 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.example.nikhiljoshi.enlighten"
+        minSdkVersion 10
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildTypes.each {
+        it.buildConfigField 'String', 'BOOKS_API_KEY', '"a6cfcd8258fd1656fac998ce0787c2cf:3:70462991"'
+        it.buildConfigField 'String', 'MOST_POPULAR_API_KEY', '"ebde6e2a65389d4fbfd6c89439e4a311:11:70462991"'
+        it.buildConfigField 'String', 'MOVIE_REVIEWS_API_KEY', '"a4fad385583858a73f4eeaa47e74f6a1:2:70462991"'
+        it.buildConfigField 'String', 'TOP_STORIES_API_KEY', '"acdfabba00d7b691bc6e4d132bfc298c:9:70462991"'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+}
