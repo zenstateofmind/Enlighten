@@ -7,15 +7,21 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
- * Created by nikhiljoshi on 4/25/16.
+ * Interface that will be implemented by Retrofit in {@link ServiceGenerator}
+ * to generate the methods that will be used to access New York Times information
  */
 public interface NytService {
 
-    //Books API
+    /**
+     * Returns {@link BookList} that contains the information on all the books
+     * that are present in New York Times 'Combined Print and EBook Non Fiction'
+     * list
+     */
     @GET("/svc/books/v2/lists/{date}/combined-print-and-e-book-nonfiction")
-    Call<List<BookList>> getBookLists(@Path("date") String date);
+    Call<BookList> getBookLists(@Path("date") String date, @Query("api-key") String booksApi);
 
     //Most Popular API
 

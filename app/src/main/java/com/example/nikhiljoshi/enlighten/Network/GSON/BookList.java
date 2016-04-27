@@ -7,5 +7,5 @@ import java.util.List;
  */
 public class BookList {
 
-    private List<Book> results;
+    public List<Book> results;
 }
