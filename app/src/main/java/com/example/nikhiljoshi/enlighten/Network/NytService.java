@@ -1,6 +1,6 @@
 package com.example.nikhiljoshi.enlighten.network;
 
-import com.example.nikhiljoshi.enlighten.network.GSON.BookList;
+import com.example.nikhiljoshi.enlighten.network.pojo.BookList;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

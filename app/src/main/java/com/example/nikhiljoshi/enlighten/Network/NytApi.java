@@ -3,8 +3,8 @@ package com.example.nikhiljoshi.enlighten.network;
 import android.util.Log;
 
 import com.example.nikhiljoshi.enlighten.BuildConfig;
-import com.example.nikhiljoshi.enlighten.network.GSON.Book;
-import com.example.nikhiljoshi.enlighten.network.GSON.BookList;
+import com.example.nikhiljoshi.enlighten.network.pojo.Book;
+import com.example.nikhiljoshi.enlighten.network.pojo.BookList;
 import com.example.nikhiljoshi.enlighten.Utility;
 
 import java.io.IOException;

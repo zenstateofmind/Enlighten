@@ -1,6 +1,6 @@
 package com.example.nikhiljoshi.enlighten;
 
-import com.example.nikhiljoshi.enlighten.network.GSON.BookList;
+import com.example.nikhiljoshi.enlighten.network.pojo.BookList;
 import com.example.nikhiljoshi.enlighten.network.NytApi;
 
 import org.junit.Before;

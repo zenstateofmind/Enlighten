@@ -3,7 +3,7 @@ package com.example.nikhiljoshi.enlighten.network;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.InstrumentationTestCase;
 
-import com.example.nikhiljoshi.enlighten.network.GSON.Book;
+import com.example.nikhiljoshi.enlighten.network.pojo.Book;
 
 import org.junit.Before;
 import org.junit.Test;
