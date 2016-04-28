@@ -1,4 +1,4 @@
-package com.example.nikhiljoshi.enlighten.Network.GSON;
+package com.example.nikhiljoshi.enlighten.network.GSON;
 
 import java.util.List;
 

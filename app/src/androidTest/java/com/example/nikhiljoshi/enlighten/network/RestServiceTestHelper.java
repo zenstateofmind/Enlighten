@@ -1,4 +1,4 @@
-package com.example.nikhiljoshi.enlighten;
+package com.example.nikhiljoshi.enlighten.network;
 
 import android.content.Context;
 

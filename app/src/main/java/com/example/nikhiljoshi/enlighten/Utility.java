@@ -20,8 +20,9 @@ public class Utility {
         int year = calendar.get(Calendar.YEAR);
 
         String formattedMonth = month < 10 ? "0" + month : month + "";
+        String formattedDay = day < 10 ? "0" + day : day + "";
 
-        String formattedDate = year + "-" + formattedMonth + "-" + day;
+        String formattedDate = year + "-" + formattedMonth + "-" + formattedDay;
         return formattedDate;
     }
 }

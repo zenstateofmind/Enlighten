@@ -1,8 +1,6 @@
-package com.example.nikhiljoshi.enlighten.Network;
+package com.example.nikhiljoshi.enlighten.network;
 
-import com.example.nikhiljoshi.enlighten.Network.GSON.BookList;
-
-import java.util.List;
+import com.example.nikhiljoshi.enlighten.network.GSON.BookList;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

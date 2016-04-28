@@ -1,10 +1,10 @@
-package com.example.nikhiljoshi.enlighten.Network;
+package com.example.nikhiljoshi.enlighten.network;
 
 import android.util.Log;
 
 import com.example.nikhiljoshi.enlighten.BuildConfig;
-import com.example.nikhiljoshi.enlighten.Network.GSON.Book;
-import com.example.nikhiljoshi.enlighten.Network.GSON.BookList;
+import com.example.nikhiljoshi.enlighten.network.GSON.Book;
+import com.example.nikhiljoshi.enlighten.network.GSON.BookList;
 import com.example.nikhiljoshi.enlighten.Utility;
 
 import java.io.IOException;
@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 /**

@@ -1,13 +1,9 @@
-package com.example.nikhiljoshi.enlighten;
+package com.example.nikhiljoshi.enlighten.network;
 
 import android.support.test.runner.AndroidJUnit4;
 import android.test.InstrumentationTestCase;
 
-import com.example.nikhiljoshi.enlighten.Network.GSON.Book;
-import com.example.nikhiljoshi.enlighten.Network.NytApi;
-import com.example.nikhiljoshi.enlighten.Network.ServiceGenerator;
-
-import junit.framework.Assert;
+import com.example.nikhiljoshi.enlighten.network.GSON.Book;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,11 +11,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 
-import okhttp3.Dispatcher;
-import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 

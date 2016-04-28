@@ -1,4 +1,4 @@
-package com.example.nikhiljoshi.enlighten.Network;
+package com.example.nikhiljoshi.enlighten.network;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;

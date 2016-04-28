@@ -1,7 +1,7 @@
 package com.example.nikhiljoshi.enlighten;
 
-import com.example.nikhiljoshi.enlighten.Network.GSON.BookList;
-import com.example.nikhiljoshi.enlighten.Network.NytApi;
+import com.example.nikhiljoshi.enlighten.network.GSON.BookList;
+import com.example.nikhiljoshi.enlighten.network.NytApi;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -14,7 +14,6 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.IOException;
-import java.util.Date;
 
 import retrofit2.Callback;
 

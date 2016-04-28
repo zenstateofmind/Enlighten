@@ -1,4 +1,4 @@
-package com.example.nikhiljoshi.enlighten.Network.GSON;
+package com.example.nikhiljoshi.enlighten.network.GSON;
 
 /**
  * Created by nikhiljoshi on 4/25/16.
