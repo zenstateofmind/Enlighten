@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 23
@@ -22,7 +23,10 @@ android {
         it.buildConfigField 'String', 'MOST_POPULAR_API_KEY', '"ebde6e2a65389d4fbfd6c89439e4a311:11:70462991"'
         it.buildConfigField 'String', 'MOVIE_REVIEWS_API_KEY', '"a4fad385583858a73f4eeaa47e74f6a1:2:70462991"'
         it.buildConfigField 'String', 'TOP_STORIES_API_KEY', '"acdfabba00d7b691bc6e4d132bfc298c:9:70462991"'
+        it.buildConfigField 'String', 'TWITTER_KEY', '"YPZVCRLr3eclsAFfprm2dXA0d"'
+        it.buildConfigField 'String', 'TWITTER_SECRET', '"uou2Jv8tinGGUG3XYn2fNxvQZ0gZ5MkKETKMIrm4v4TjZOJZMs"'
     }
+
 }
 
 dependencies {
@@ -36,7 +40,10 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
     compile 'com.android.support:gridlayout-v7:22.2.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile 'com.android.support:cardview-v7:23.3.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     androidTestCompile 'com.android.support:support-annotations:23.3.0'
@@ -45,4 +52,22 @@ dependencies {
     androidTestCompile('com.squareup.okhttp3:mockwebserver:3.2.0') {
         exclude group: 'com.squareup.okhttp'
     }
+
+    // Crashlytics Kit
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+        transitive = true
+    }
+    // Twitter Kit
+    compile('com.twitter.sdk.android:twitter:1.12.0@aar') {
+        transitive = true
+    }
+    // Digits Kit
+    compile('com.digits.sdk.android:digits:1.10.2@aar') {
+        transitive = true
+    }
+    // MoPub Kit
+    compile('com.mopub.sdk.android:mopub:4.3.0@aar') {
+        transitive = true
+    }
+
 }

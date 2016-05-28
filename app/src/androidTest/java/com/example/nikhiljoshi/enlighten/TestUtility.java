@@ -14,6 +14,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import okhttp3.internal.Util;
+
 /**
  * Created by nikhiljoshi on 4/25/16.
  */
@@ -36,6 +38,21 @@ public class TestUtility extends InstrumentationTestCase {
         Date date = sdf.parse(realDate);
         final String formattedDate = Utility.formatDate(date);
         Assert.assertTrue("There is some issue with the date formatting", formattedDate.equals(realDate));
+    }
+
+    @Test
+    public void testCamelCase() {
+        String title = "FIRST WOMEN";
+        String camelCase = Utility.camelCase(title);
+        assertEquals("Error: There are issues with camel casing", camelCase, "First Women");
+
+        title = "A";
+        camelCase = Utility.camelCase(title);
+        assertEquals("Error: There are issues with camel casing", camelCase, "A");
+
+        title = "BETWEEN THE WORLD AND ME";
+        camelCase = Utility.camelCase(title);
+        assertEquals("Error: There are issues with camel casing", camelCase, "Between The World And Me");
     }
 }
 

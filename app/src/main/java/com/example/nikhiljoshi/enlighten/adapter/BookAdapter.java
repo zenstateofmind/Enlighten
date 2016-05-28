@@ -1,6 +1,7 @@
 package com.example.nikhiljoshi.enlighten.adapter;
 
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.nikhiljoshi.enlighten.R;
+import com.example.nikhiljoshi.enlighten.Utility;
 import com.example.nikhiljoshi.enlighten.network.pojo.Book;
 import com.example.nikhiljoshi.enlighten.network.pojo.BookDetails;
 import com.squareup.picasso.Picasso;
@@ -29,16 +31,19 @@ import java.util.List;
  *  @author nikhiljoshi
  *
  */
-public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
+public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> implements DataSwappableAdapter<Book> {
 
     private List<Book> books;
+    private View mEmptyView;
+    private Context mContext;
 
     /**
      * This is the internal ViewHolder that is integral to the entire BookAdapter.
      * All BookAdapter does at this point of time is take a specific book and send it over
      * to the View Holder to decorate the book_info_lis_item.xml
      */
-    public static class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class BookViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
 
         public ImageView bookImage;
         public TextView bookAuthor;
@@ -53,10 +58,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             bookInfoListItemView.setOnClickListener(this);
         }
 
-        public void bindView(Book book) {
+        public void bindView(Book book, int position) {
             BookDetails bookDetails = book.book_details.get(0);
             bookAuthor.setText(bookDetails.author);
-            bookCaption.setText(bookDetails.title);
+            bookCaption.setText(Utility.camelCase(bookDetails.title));
             Picasso.with(bookImage.getContext()).load(bookDetails.book_image).into(bookImage);
         }
 
@@ -67,8 +72,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         }
     }
 
-    public BookAdapter(List<Book> books) {
-        this.books = books;
+    public BookAdapter(Context context, View emptyView) {
+        mContext = context;
+        mEmptyView =  emptyView;
     }
 
     /**
@@ -94,12 +100,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     public void onBindViewHolder(BookViewHolder holder, int position) {
         Book book = books.get(position);
         // TODO: What happens if index out of bound exception pops up
-        holder.bindView(book);
+        holder.bindView(book, position);
     }
 
     @Override
     public int getItemCount() {
-        return books.size();
+        return books == null ? 0 : books.size();
     }
 
     /**
@@ -114,6 +120,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         books.clear();
         books.addAll(newBooks);
         notifyDataSetChanged();
+
+        /**
+         * If there are books that can be plugged in, then we can make the empty view
+         * as invisible
+         */
+        if (newBooks.size() > 0) {
+            mEmptyView.setVisibility(View.GONE);
+        } else {
+            mEmptyView.setVisibility(View.VISIBLE);
+        }
     }
 
 }
