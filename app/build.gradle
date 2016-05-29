@@ -32,10 +32,12 @@ android {
 dependencies {
     testCompile 'junit:junit:4.12'
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:23.3.0'
+
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'com.squareup.okhttp3:mockwebserver:3.2.0'
 
-    compile 'com.android.support:appcompat-v7:23.3.0'
+
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.squareup.retrofit2:retrofit:2.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
@@ -69,5 +71,7 @@ dependencies {
     compile('com.mopub.sdk.android:mopub:4.3.0@aar') {
         transitive = true
     }
+
+
 
 }

@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.nikhiljoshi.enlighten.R;
+import com.example.nikhiljoshi.enlighten.ui.Fragment.ArticlesFragment;
 import com.example.nikhiljoshi.enlighten.ui.Fragment.SelectFriendsFragment;
 import com.example.nikhiljoshi.enlighten.ui.Fragment.SelectFriendsInstructionsFragment;
 
@@ -31,7 +32,7 @@ public class SelectFriendsActivity extends AppCompatActivity implements SelectFr
     public void onSelected() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.select_friends_container,
-                        new SelectFriendsFragment())
+                        new ArticlesFragment())
                 .commit();
     }
 }

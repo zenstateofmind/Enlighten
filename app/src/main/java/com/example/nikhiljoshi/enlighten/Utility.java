@@ -69,6 +69,44 @@ public class Utility {
         return tweetsWithLink;
     }
 
+    /**
+     * The first link in a twitter with links is the link that is attached in the tweet
+     */
+    public static String getLinkFromTweet(Tweet tweet) {
+
+        if (countNumLinksInTweet(tweet) < 2) {
+            throw new IllegalAccessError();
+        }
+
+        String[] words = TextUtils.split(tweet.text, " ");
+        int numLinks = 0;
+        String linkFormat = "https://t.co/";
+        for (String word : words) {
+            if (word.contains(linkFormat)) {
+                word = cleanLink(word);
+                return word;
+            }
+        }
+        return linkFormat;
+    }
+
+    private static String cleanLink(String link) {
+        //if link starts with \n, remove it
+        if (!link.startsWith("http")) {
+            int startIndexOfHttp = link.indexOf("http");
+            link = link.substring(startIndexOfHttp);
+        }
+
+        // once we remove any garbage before "http" begins, if the link
+        // still contains garbage such as
+        if (link.contains("\n")) {
+            int startOfJunk = link.indexOf("\n");
+            link = link.substring(0, startOfJunk);
+        }
+
+        return link;
+    }
+
     private static int countNumLinksInTweet(Tweet tweet) {
         String[] words = TextUtils.split(tweet.text, " ");
         int numLinks = 0;
@@ -81,6 +119,19 @@ public class Utility {
         return numLinks;
     }
 
+    public static String getPublicationFromUrl(String url) {
+        //Separate https or http from the rest of the website
+        String[] firstSeparators = TextUtils.split(url, "//");
+        String httpAndHttpsRemovedLink = "";
+        if(!url.contains("http://") && !url.contains("https://")) {
+            httpAndHttpsRemovedLink = firstSeparators[0];
+        } else {
+            httpAndHttpsRemovedLink = firstSeparators[1];
+        }
+
+        String[] publicationWebsiteSeparator = TextUtils.split(httpAndHttpsRemovedLink, "/");
+        return publicationWebsiteSeparator[0];
+    }
 
     /**
      * Twitter profile image url that is returned as part of the API is of low pixel quality.

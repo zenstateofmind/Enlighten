@@ -78,7 +78,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
             users = new ArrayList<User>();
 
         }
-        users.addAll(extraUsers);
+//        users.addAll(extraUsers);
+        users.addAll(0, extraUsers);
 
         notifyDataSetChanged();
     }

@@ -1,12 +1,15 @@
 package com.example.nikhiljoshi.enlighten.network;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.nikhiljoshi.enlighten.Utility;
 import com.example.nikhiljoshi.enlighten.adapter.ArticleAdapter;
 import com.example.nikhiljoshi.enlighten.adapter.FriendsAdapter;
+import com.example.nikhiljoshi.enlighten.data.ArticleInfo;
+import com.example.nikhiljoshi.enlighten.network.AsyncTask.TweetToArticleInfoTask;
 import com.example.nikhiljoshi.enlighten.network.pojo.FriendsInfo;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
@@ -49,7 +52,7 @@ public class MyTwitterApi {
             public void success(Result<FriendsInfo> result) {
                 List<User> friends = result.data.users;
                 for (User friend : friends) {
-                    getUserTweetsWithLinks(friend.id, friend.name);
+//                    getUserTweetsWithLinks(friend.id, friend.name);
                 }
                 friendsAdapter.addUsers(friends);
                 if (countDown > 0) {
@@ -66,13 +69,20 @@ public class MyTwitterApi {
         });
     }
 
-    public void getUserTweetsWithLinks(final Long userId, final String userName) {
+    public void getUserTweetsWithLinks(final Long userId, final String userName, final ArticleAdapter articleAdapter) {
         twitterApiClient.getStatusesService().userTimeline(userId, null, 200, null, null,
                 null, null, null, null, new Callback<List<Tweet>>() {
                     @Override
                     public void success(Result<List<Tweet>> result) {
                         List<Tweet> tweets = Utility.filterTweetsWithLink(result.data);
                         Log.i(LOG, "Number of tweets by " + userName + " is as follows: " + tweets.size());
+                        if (tweets.size() > 0) {
+                            Log.i(LOG, "Tweet by username " + userName + " and the first tweet is: " + tweets.get(0).text );
+                        }
+
+
+                        TweetToArticleInfoTask task = new TweetToArticleInfoTask(articleAdapter);
+                        task.execute(tweets);
                     }
 
                     @Override

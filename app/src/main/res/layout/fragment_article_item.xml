@@ -3,27 +3,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/activity_vertical_margin"
-            android:id="@+id/headlines"
-            android:hint="@string/headlines_hint"/>
+    <com.twitter.sdk.android.tweetui.TweetView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tweet_view"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/author"
-            android:padding="@dimen/activity_vertical_margin"
-            android:hint="@string/author_hint"/>
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:padding="@dimen/activity_horizontal_margin"-->
+        <!--android:id="@+id/tweet_poster"-->
+        <!--android:hint="Tweet_poster"/>-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/publication"
-            android:padding="@dimen/activity_vertical_margin"
-            android:hint="@string/publication_hint"/>
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:padding="@dimen/activity_vertical_margin"-->
+        <!--android:id="@+id/headlines"-->
+        <!--android:hint="@string/headlines_hint"/>-->
+
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/publication"-->
+        <!--android:padding="@dimen/activity_vertical_margin"-->
+        <!--android:hint="@string/publication_hint"/>-->
 
 </LinearLayout>
