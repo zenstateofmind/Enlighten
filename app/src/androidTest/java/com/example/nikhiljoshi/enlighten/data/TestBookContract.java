@@ -3,6 +3,8 @@ package com.example.nikhiljoshi.enlighten.data;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
+import com.example.nikhiljoshi.enlighten.data.Contract.BookContract;
+
 /**
  * Ensure that the URI are being built the way we want them to be.
  * Also, try and get data out of the URI... such as the author name and the

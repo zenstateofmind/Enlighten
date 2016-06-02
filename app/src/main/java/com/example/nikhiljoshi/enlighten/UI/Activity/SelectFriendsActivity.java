@@ -32,7 +32,7 @@ public class SelectFriendsActivity extends AppCompatActivity implements SelectFr
     public void onSelected() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.select_friends_container,
-                        new ArticlesFragment())
+                        new SelectFriendsFragment())
                 .commit();
     }
 }

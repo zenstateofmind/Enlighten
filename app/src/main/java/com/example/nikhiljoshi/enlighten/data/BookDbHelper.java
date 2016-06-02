@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import static com.example.nikhiljoshi.enlighten.data.BookContract.BookEntry.*;
+import static com.example.nikhiljoshi.enlighten.data.Contract.BookContract.BookEntry.*;
 
 /**
  * This class contains the sql statements that create the 'book' table in

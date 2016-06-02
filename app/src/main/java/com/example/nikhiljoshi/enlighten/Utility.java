@@ -1,8 +1,10 @@
 package com.example.nikhiljoshi.enlighten;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.core.models.UrlEntity;
 
 import org.w3c.dom.Text;
 
@@ -60,9 +62,10 @@ public class Utility {
     public static List<Tweet> filterTweetsWithLink(List<Tweet> tweets) {
         List<Tweet> tweetsWithLink = new ArrayList<>();
         for (Tweet tweet : tweets) {
-            // If a certain tweet contains a link, twitter embeds two links into the tweet.
-            // For example: To think like this, it helps to have one if these. 😀 @conorsen https://t.co/fmqLc1Zgwb https://t.co/ORtps6PYxg
-            if (countNumLinksInTweet(tweet) >= 2) {
+            List<UrlEntity> urls = tweet.entities.urls;
+            if (urls.size() > 1) {
+                tweetsWithLink.add(tweet);
+            } else if (urls.size() == 1 && !urls.get(0).expandedUrl.contains("twitter")) {
                 tweetsWithLink.add(tweet);
             }
         }

@@ -5,11 +5,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.data.ArticleInfo;
 import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.tweetui.TweetView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.Articles
 
     private static final String LOG_TAG = ArticleAdapter.class.getSimpleName();
 
-    private List<ArticleInfo> articleRelatedTweets;
+    private List<Tweet> tweets;
 
     @Override
     public ArticlesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -37,44 +39,45 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.Articles
 
     @Override
     public void onBindViewHolder(ArticlesViewHolder holder, int position) {
-        if (articleRelatedTweets.size() > position) {
-            ArticleInfo articleInfo = articleRelatedTweets.get(position);
-            holder.bindView(articleInfo);
+        if (tweets.size() > position) {
+            Tweet tweet = tweets.get(position);
+            Log.i(LOG_TAG, "Position is: " + position);
+            holder.bindView(tweet);
         }
     }
 
     @Override
     public int getItemCount() {
-        return articleRelatedTweets != null ? articleRelatedTweets.size() : 0;
+        return tweets != null ? tweets.size() : 0;
     }
 
     public static class ArticlesViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView headlineText;
-        public TextView publicationText;
-        public TextView tweetUserName;
+        public LinearLayout articleItemView;
 
         public ArticlesViewHolder(View itemView) {
             super(itemView);
-            View articleItemView = itemView;
-            tweetUserName = (TextView) articleItemView.findViewById(R.id.tweet_poster);
-            headlineText = (TextView) articleItemView.findViewById(R.id.headlines);
-            publicationText = (TextView) articleItemView.findViewById(R.id.publication);
+            articleItemView = (LinearLayout) itemView;
         }
 
-        public void bindView(ArticleInfo articleInfo) {
-            headlineText.setText(articleInfo.title);
-            publicationText.setText(articleInfo.publication);
-            tweetUserName.setText(articleInfo.username);
-            Log.i(LOG_TAG, "Binded view for : " + articleInfo.title);
+        public void bindView(Tweet tweet) {
+            if (articleItemView.getChildCount() > 0) {
+                articleItemView.removeAllViews();
+            }
+            articleItemView.addView(new TweetView(articleItemView.getContext(), tweet,  R.style.tw__TweetDarkWithActionsStyle));
+            Log.i(LOG_TAG, "Binded view for : " + tweet.text);
         }
     }
 
-    public void addArticleRelatedTweets(List<ArticleInfo> articleInfos) {
-        if (articleRelatedTweets == null) {
-            articleRelatedTweets = new ArrayList<>();
+    public void addArticleRelatedTweets(List<Tweet> freshTweets) {
+        if (tweets == null) {
+            tweets = new ArrayList<>();
         }
-        articleRelatedTweets.addAll(articleInfos);
+        tweets.addAll(freshTweets);
+        for (Tweet tweet :
+                freshTweets) {
+            Log.i(LOG_TAG, "Tweet: " + tweet.text);
+        }
         notifyDataSetChanged();
     }
 }

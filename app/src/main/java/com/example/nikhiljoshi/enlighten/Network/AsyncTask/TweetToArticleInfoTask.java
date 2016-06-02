@@ -32,10 +32,10 @@ public class TweetToArticleInfoTask extends AsyncTask<List<Tweet>, Object, List<
         this.adapter = adapter;
     }
 
-    @Override
-    protected void onPostExecute(List<ArticleInfo> articleInfos) {
-        adapter.addArticleRelatedTweets(articleInfos);
-    }
+//    @Override
+//    protected void onPostExecute(List<ArticleInfo> articleInfos) {
+//        adapter.addArticleRelatedTweets(articleInfos);
+//    }
 
     @Override
     protected List<ArticleInfo> doInBackground(List<Tweet>... params) {

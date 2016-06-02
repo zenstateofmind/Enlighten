@@ -6,7 +6,8 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.annotation.Nullable;
+
+import com.example.nikhiljoshi.enlighten.data.Contract.BookContract;
 
 /**
  * Content provider for the Book table

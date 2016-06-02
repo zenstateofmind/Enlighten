@@ -5,10 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.twitter.sdk.android.tweetui.TweetView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tweet_view"/>
+
 
     <!--<TextView-->
         <!--android:layout_width="match_parent"-->

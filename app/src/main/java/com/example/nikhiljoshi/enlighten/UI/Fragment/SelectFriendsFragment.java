@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -57,10 +58,15 @@ public class SelectFriendsFragment extends Fragment {
 //        });
 
         MyTwitterApi api = new MyTwitterApi(getActivity().getApplicationContext());
-        api.getFriends(mUserFriendsAdapter);
+        api.getFriendsListTake2(mUserFriendsAdapter);
 
 //        api.get(5943622L);
 
         return rootView;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 }

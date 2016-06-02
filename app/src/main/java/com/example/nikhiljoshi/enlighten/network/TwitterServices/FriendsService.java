@@ -1,5 +1,6 @@
-package com.example.nikhiljoshi.enlighten.network;
+package com.example.nikhiljoshi.enlighten.network.TwitterServices;
 
+import com.example.nikhiljoshi.enlighten.network.pojo.FriendIds;
 import com.example.nikhiljoshi.enlighten.network.pojo.FriendsInfo;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.models.User;
@@ -17,5 +18,8 @@ public interface FriendsService {
 
     @GET("/1.1/friends/list.json")
     void list(@Query("user_id") long user_id, @Query("cursor") long next_cursor, Callback<FriendsInfo> callback);
+
+    @GET("/1.1/friends/ids.json")
+    void ids(@Query("user_id") long user_id, @Query("screen_name") String screen_name, @Query("count") Integer count, Callback<FriendIds> callback);
 
 }

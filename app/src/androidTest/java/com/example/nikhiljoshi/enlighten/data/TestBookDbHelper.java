@@ -6,10 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
 import com.example.nikhiljoshi.enlighten.TestDataOperator;
+import com.example.nikhiljoshi.enlighten.data.Contract.BookContract;
 
 import java.util.HashSet;
 
-import static com.example.nikhiljoshi.enlighten.data.BookContract.BookEntry.*;
+import static com.example.nikhiljoshi.enlighten.data.Contract.BookContract.BookEntry.*;
 
 /**
  * Created by nikhiljoshi on 4/27/16.

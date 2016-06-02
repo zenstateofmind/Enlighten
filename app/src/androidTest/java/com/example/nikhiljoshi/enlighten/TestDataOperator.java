@@ -7,7 +7,7 @@ import android.test.AndroidTestCase;
 import java.util.Map;
 import java.util.Set;
 
-import static com.example.nikhiljoshi.enlighten.data.BookContract.BookEntry.*;
+import static com.example.nikhiljoshi.enlighten.data.Contract.BookContract.BookEntry.*;
 
 /**
  * Created by nikhiljoshi on 4/27/16.

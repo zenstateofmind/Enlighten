@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import com.example.nikhiljoshi.enlighten.TestDataOperator;
+import com.example.nikhiljoshi.enlighten.data.Contract.BookContract;
 
 /**
  * Test Book Provider

@@ -2,6 +2,7 @@ package com.example.nikhiljoshi.enlighten.network;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,6 +11,7 @@ import com.example.nikhiljoshi.enlighten.adapter.ArticleAdapter;
 import com.example.nikhiljoshi.enlighten.adapter.FriendsAdapter;
 import com.example.nikhiljoshi.enlighten.data.ArticleInfo;
 import com.example.nikhiljoshi.enlighten.network.AsyncTask.TweetToArticleInfoTask;
+import com.example.nikhiljoshi.enlighten.network.pojo.FriendIds;
 import com.example.nikhiljoshi.enlighten.network.pojo.FriendsInfo;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
@@ -69,6 +71,49 @@ public class MyTwitterApi {
         });
     }
 
+    public void getFriendsListTake2(final FriendsAdapter friendsAdapter) {
+        myTwitterApiClient.getFriendsService().ids(twitterSession.getUserId(), null, 5000, new Callback<FriendIds>() {
+            @Override
+            public void success(Result<FriendIds> result) {
+                List<Long> ids = result.data.ids;
+                getUserInfoFromIds(ids, friendsAdapter);
+            }
+
+            @Override
+            public void failure(TwitterException e) {
+                Log.d(LOG, "Failed to get the friends' ids: " + e);
+            }
+        });
+    }
+
+    private void getUserInfoFromIds(List<Long> friendIds, final FriendsAdapter friendsAdapter) {
+
+        int numUsersPerRequest = 100;
+        // /users/lookup.json takes a max of 100 comma separated user ids
+        int numBatchesOfHunderFriendsEach = friendIds.size() / numUsersPerRequest;
+        int startIndex = 0;
+
+        for (int i = 0; i < numBatchesOfHunderFriendsEach; i++) {
+            int endIndex = friendIds.size() > numUsersPerRequest ? numUsersPerRequest : friendIds.size();
+            List<Long> subsetOfFriendIds = friendIds.subList(startIndex, endIndex + startIndex);
+
+            String commaSeparatedSubsetOfIds = TextUtils.join(",", subsetOfFriendIds);
+            myTwitterApiClient.getUsersService().lookup(commaSeparatedSubsetOfIds, new Callback<List<User>>() {
+                @Override
+                public void success(Result<List<User>> result) {
+                    friendsAdapter.addUsers(result.data);
+                }
+
+                @Override
+                public void failure(TwitterException e) {
+                    Log.d(LOG, "Failed to get the user information of the following friend ids: " + e);
+                }
+            });
+            startIndex += numUsersPerRequest;
+        }
+
+    }
+
     public void getUserTweetsWithLinks(final Long userId, final String userName, final ArticleAdapter articleAdapter) {
         twitterApiClient.getStatusesService().userTimeline(userId, null, 200, null, null,
                 null, null, null, null, new Callback<List<Tweet>>() {
@@ -81,8 +126,9 @@ public class MyTwitterApi {
                         }
 
 
-                        TweetToArticleInfoTask task = new TweetToArticleInfoTask(articleAdapter);
-                        task.execute(tweets);
+//                        TweetToArticleInfoTask task = new TweetToArticleInfoTask(articleAdapter);
+//                        task.execute(tweets);
+                        articleAdapter.addArticleRelatedTweets(tweets);
                     }
 
                     @Override

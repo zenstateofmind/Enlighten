@@ -2,7 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="@dimen/activity_vertical_margin">
 
     <ImageView
         android:layout_width="match_parent"
@@ -20,7 +21,6 @@
         android:id="@+id/profile_name"
         android:text="Marc Andreessen"
         android:layout_below="@+id/profile_picture"
-        android:background="@drawable/touch_selector_white"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
 
