@@ -1,4 +1,4 @@
-package com.example.nikhiljoshi.enlighten.data;
+package com.example.nikhiljoshi.enlighten.data.Provider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import com.example.nikhiljoshi.enlighten.data.BookDbHelper;
 import com.example.nikhiljoshi.enlighten.data.Contract.BookContract;
 
 /**
