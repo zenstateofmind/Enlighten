@@ -2,10 +2,15 @@ package com.example.nikhiljoshi.enlighten.data.Contract;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import com.example.nikhiljoshi.enlighten.network.pojo.Friend;
+import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.internal.TwitterCollection;
+import com.twitter.sdk.android.core.models.User;
 
 /**
  * Created by nikhiljoshi on 6/2/16.
@@ -18,12 +23,14 @@ public class EnlightenContract {
 
     public static final String PATH_FRIEND = "friend";
 
+    public static final String PATH_PACK = "pack";
+
     public static final class FriendEntry implements BaseColumns {
 
-        //table name
+        //////////////// table name ///////////////////////
         public static final String TABLE_NAME = "friend";
 
-        // user id of the person who has logged in
+        ////////////// column names /////////////////////
         public static final String COLUMN_CURRENT_SESSION_USER_ID = "current_session_user_id";
 
         public static final String COLUMN_USER_ID = "friend_user_id";
@@ -33,6 +40,8 @@ public class EnlightenContract {
         public static final String COLUMN_PROFILE_NAME = "profile_name";
 
         public static final String COLUMN_PROFILE_PICTURE_URL = "profile_picture_url";
+
+        public static final String COLUMN_PACK_KEY = "pack_id";
 
 
         ///////// URI Stuff //////////////
@@ -46,8 +55,13 @@ public class EnlightenContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY;
 
-        public static Uri buildFriendUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+        //////////// Functions to build URIs/////////////////////
+
+        /**
+         * Used to return URI with the row ID of the inserted data
+         */
+        public static Uri buildFriendUriWithInsertedRowId(long insertedRowId) {
+            return ContentUris.withAppendedId(CONTENT_URI, insertedRowId);
         }
 
         public static Uri buildFriendUriWithCurrentUserId(Long currentSessionUserId) {
@@ -57,19 +71,81 @@ public class EnlightenContract {
         public static Uri buildUriWithCurrentUserIdAndFriendUserName(Long currentSessionUserId,
                                                                      String userName) {
             return CONTENT_URI.buildUpon().appendPath(currentSessionUserId + "")
-                    .appendQueryParameter(COLUMN_USER_NAME, userName).build();
+                    .appendPath(userName).build();
         }
 
-        public static Long getCurrentUserIdFromUri(Uri uri) {
+        //////////////// Get info from built uri //////////////////
+
+        public static long getCurrentUserIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
 
         public static String getFriendUsernameFromUri(Uri uri) {
-            String friendUserName = uri.getQueryParameter(COLUMN_USER_NAME);
-            if (friendUserName != null) {
-                return friendUserName;
-            }
-            return "";
+            return uri.getPathSegments().get(2);
         }
+
+        ///////////////// Helper functions ////////////////////
+
+        public static ContentValues getContentValues(User user) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_CURRENT_SESSION_USER_ID, Twitter.getSessionManager().getActiveSession().getUserId());
+            contentValues.put(COLUMN_USER_ID, user.getId());
+            contentValues.put(COLUMN_PROFILE_NAME, user.name);
+            contentValues.put(COLUMN_USER_NAME, user.screenName);
+            contentValues.put(COLUMN_PROFILE_PICTURE_URL, user.profileImageUrlHttps);
+            return contentValues;
+        }
+
+        public static Friend convertToFriend(Cursor cursor) {
+            int userNameIndex = cursor.getColumnIndex(COLUMN_USER_NAME);
+            int profileNameIndex = cursor.getColumnIndex(COLUMN_PROFILE_NAME);
+            int profilePictureUrlIndex = cursor.getColumnIndex(COLUMN_PROFILE_PICTURE_URL);
+            int userIdIndex = cursor.getColumnIndex(COLUMN_USER_ID);
+
+            String userName = cursor.getString(userNameIndex);
+            String profileName = cursor.getString(profileNameIndex);
+            String profilePictureUrl = cursor.getString(profilePictureUrlIndex);
+            long userId = cursor.getLong(userIdIndex);
+
+            return new Friend(userName, profileName, profilePictureUrl, userId);
+        }
+    }
+
+    public static final class PackEntry implements BaseColumns {
+
+        //// TABLE NAME //////////
+        public static final String TABLE_NAME = "pack";
+
+        //////////// Columns /////////////
+        public static final String COLUMN_PACK_NAME = "pack_name";
+
+        public static final String COLUMN_PACK_PARENT_NAME = "parent_pack_name";
+
+        public static final String COLUMN_DESCRIPTION = "pack_description";
+
+        /////// URI ////////////////
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_PACK).build();
+
+
+        //////////// Functions to build URIs/////////////////////
+
+        public static Uri buildPathUriWithPackName(String packName) {
+            return CONTENT_URI.buildUpon().appendPath(packName).build();
+        }
+
+        public static Uri buildPathUriWithParentPackName(String parentPackName) {
+            return CONTENT_URI.buildUpon().appendPath(parentPackName).build();
+        }
+
+        //////////////// Get info from built uri //////////////////
+
+        public static String getPackNameFromPathNameUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static String getParentPackNameFromPathNameUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
     }
 }

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.adapter.ArticleAdapter;
+import com.example.nikhiljoshi.enlighten.adapter.FriendAdapter;
 import com.example.nikhiljoshi.enlighten.network.MyTwitterApi;
 import com.twitter.sdk.android.tweetui.TweetViewFetchAdapter;
 
@@ -25,8 +26,12 @@ public class ArticlesFragment extends Fragment {
     private RecyclerView mRecyclerView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_articles_view, container, false);
+
+        Bundle arguments = getArguments();
+        String userName = arguments.getString(FriendAdapter.USER_NAME);
+        long userId = arguments.getLong(FriendAdapter.USER_ID);
 
         mArticleAdapter = new ArticleAdapter();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.articles_recycle_view);
@@ -35,7 +40,7 @@ public class ArticlesFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         MyTwitterApi api = new MyTwitterApi(getActivity().getApplicationContext());
-        api.getUserTweetsWithLinks(5943622L, "pmarca", mArticleAdapter);
+        api.getUserTweetsWithLinks(userId, userName, mArticleAdapter);
 
 
         return rootView;

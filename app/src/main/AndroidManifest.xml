@@ -27,9 +27,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.Activity.LoginActivity" />
         </activity>
+
+        <activity android:name=".ui.Activity.MainActivity"
+            android:label="My Friends!">
+        </activity>
+
+        <activity android:name=".ui.Activity.ArticleActivity"
+            android:label="Tweets">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.Activity.MainActivity" />
+        </activity>
         <provider
             android:authorities="com.example.nikhiljoshi.enlighten"
-            android:name=".data.Provider.BookProvider"/>
+            android:name=".data.Provider.EnlightenProvider" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

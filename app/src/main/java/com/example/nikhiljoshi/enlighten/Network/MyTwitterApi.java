@@ -1,16 +1,13 @@
 package com.example.nikhiljoshi.enlighten.network;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.nikhiljoshi.enlighten.Utility;
 import com.example.nikhiljoshi.enlighten.adapter.ArticleAdapter;
-import com.example.nikhiljoshi.enlighten.adapter.FriendsAdapter;
-import com.example.nikhiljoshi.enlighten.data.ArticleInfo;
-import com.example.nikhiljoshi.enlighten.network.AsyncTask.TweetToArticleInfoTask;
+import com.example.nikhiljoshi.enlighten.adapter.UsersAdapter;
 import com.example.nikhiljoshi.enlighten.network.pojo.FriendIds;
 import com.example.nikhiljoshi.enlighten.network.pojo.FriendsInfo;
 import com.twitter.sdk.android.Twitter;
@@ -43,12 +40,12 @@ public class MyTwitterApi {
         twitterApiClient = Twitter.getApiClient();
     }
 
-    public void getFriends(FriendsAdapter friendsAdapter) {
+    public void getFriends(UsersAdapter usersAdapter) {
         final List<User> friends = new ArrayList<>();
-        getFriendsList(friendsAdapter, -1L, 2);
+        getFriendsList(usersAdapter, -1L, 2);
     }
 
-    private void getFriendsList( final FriendsAdapter friendsAdapter, long next_cursor, final int countDown) {
+    private void getFriendsList(final UsersAdapter usersAdapter, long next_cursor, final int countDown) {
         myTwitterApiClient.getFriendsService().list(twitterSession.getUserId(), next_cursor, new Callback<FriendsInfo>() {
             @Override
             public void success(Result<FriendsInfo> result) {
@@ -56,9 +53,9 @@ public class MyTwitterApi {
                 for (User friend : friends) {
 //                    getUserTweetsWithLinks(friend.id, friend.name);
                 }
-                friendsAdapter.addUsers(friends);
+                usersAdapter.addUsers(friends);
                 if (countDown > 0) {
-                    getFriendsList(friendsAdapter, result.data.nextCursor, countDown - 1);
+                    getFriendsList(usersAdapter, result.data.nextCursor, countDown - 1);
                     Log.i(LOG, "Next cursor: " + result.data.nextCursor);
                 }
                 Toast.makeText(context, "Number of friends: " + friends.size(), Toast.LENGTH_LONG).show();
@@ -71,12 +68,12 @@ public class MyTwitterApi {
         });
     }
 
-    public void getFriendsListTake2(final FriendsAdapter friendsAdapter) {
+    public void getFriendsListTake2(final UsersAdapter usersAdapter) {
         myTwitterApiClient.getFriendsService().ids(twitterSession.getUserId(), null, 5000, new Callback<FriendIds>() {
             @Override
             public void success(Result<FriendIds> result) {
                 List<Long> ids = result.data.ids;
-                getUserInfoFromIds(ids, friendsAdapter);
+                getUserInfoFromIds(ids, usersAdapter);
             }
 
             @Override
@@ -86,7 +83,7 @@ public class MyTwitterApi {
         });
     }
 
-    private void getUserInfoFromIds(List<Long> friendIds, final FriendsAdapter friendsAdapter) {
+    private void getUserInfoFromIds(List<Long> friendIds, final UsersAdapter usersAdapter) {
 
         int numUsersPerRequest = 100;
         // /users/lookup.json takes a max of 100 comma separated user ids
@@ -101,7 +98,7 @@ public class MyTwitterApi {
             myTwitterApiClient.getUsersService().lookup(commaSeparatedSubsetOfIds, new Callback<List<User>>() {
                 @Override
                 public void success(Result<List<User>> result) {
-                    friendsAdapter.addUsers(result.data);
+                    usersAdapter.addUsers(result.data);
                 }
 
                 @Override

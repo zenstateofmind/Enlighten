@@ -19,9 +19,9 @@ import java.util.List;
 /**
  * Adapter for friends that the user has
  */
-public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsViewHolder> {
+public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHolder> {
 
-    private static final String LOG_TAG = FriendsAdapter.class.getSimpleName();
+    private static final String LOG_TAG = UsersAdapter.class.getSimpleName();
 
     private List<User> friends;
     private List<User> selectedFriends = new ArrayList<>();
@@ -29,13 +29,13 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
     /**
      * This is the view holder for the FriendsAdapter
      */
-    public class FriendsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class UsersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         public ImageView profilePicture;
         public TextView profileName;
         public User user;
 
-        public FriendsViewHolder(View itemView) {
+        public UsersViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             View imageNameFriendItemView = itemView;
@@ -50,7 +50,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
          */
         public void bindView(User user) {
             View rootView = profilePicture.getRootView();
-            if (FriendsAdapter.this.isSelectedUser(user)) {
+            if (UsersAdapter.this.isSelectedUser(user)) {
                 setViewSettingsToSelectedUser(rootView);
             } else {
                 setViewSettingsToNonSelectedUser(rootView);
@@ -69,12 +69,12 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
          */
         @Override
         public void onClick(View itemView) {
-            if (!FriendsAdapter.this.isSelectedUser(user)) {
+            if (!UsersAdapter.this.isSelectedUser(user)) {
                 setViewSettingsToSelectedUser(itemView);
-                FriendsAdapter.this.addToSelectedFriends(user);
+                UsersAdapter.this.addToSelectedFriends(user);
             } else {
                 setViewSettingsToNonSelectedUser(itemView);
-                FriendsAdapter.this.removeFromSelectedFriends(user);
+                UsersAdapter.this.removeFromSelectedFriends(user);
             }
 
         }
@@ -89,19 +89,19 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
     }
 
     @Override
-    public FriendsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public UsersViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View friendImageNameItemView = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.friend_image_username_item, parent, false
         );
 
-        FriendsViewHolder viewHolder = new FriendsViewHolder(friendImageNameItemView);
+        UsersViewHolder viewHolder = new UsersViewHolder(friendImageNameItemView);
 
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(FriendsViewHolder holder, int position) {
+    public void onBindViewHolder(UsersViewHolder holder, int position) {
         if (friends.size() > position) {
             User user = friends.get(position);
             holder.bindView(user);

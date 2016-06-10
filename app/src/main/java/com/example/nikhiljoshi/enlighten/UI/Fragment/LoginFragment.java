@@ -14,6 +14,7 @@ import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.Utility;
 import com.example.nikhiljoshi.enlighten.network.MyTwitterApiClient;
 import com.example.nikhiljoshi.enlighten.network.pojo.FriendsInfo;
+import com.example.nikhiljoshi.enlighten.ui.Activity.MainActivity;
 import com.example.nikhiljoshi.enlighten.ui.Activity.SelectFriendsActivity;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
@@ -40,26 +41,25 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_login, container, false);
 
-        loginButton = (TwitterLoginButton) rootView.findViewById(R.id.twitter_login_button2);
+        TwitterSession activeSession = Twitter.getSessionManager().getActiveSession();
+
+//        if (activeSession != null) {
+//            Intent intent = new Intent(getContext(), MainActivity.class);
+//            startActivity(intent);
+//        } else {
+            loginButton = (TwitterLoginButton) rootView.findViewById(R.id.twitter_login_button2);
+            login();
+//        }
+
+        return rootView;
+    }
+
+    private void login() {
         Callback<TwitterSession> callback = new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
-                // The TwitterSession is also available through:
-                // Twitter.getInstance().core.getSessionManager().getActiveSession()
-                TwitterSession session = result.data;
-//                // TODO: Remove toast and use the TwitterSession's userID
                 Intent intent = new Intent(getContext(), SelectFriendsActivity.class);
                 startActivity(intent);
-                /**
-                 * Once the user has successfully signed in, direct them to the selection page,
-                 * where they can select the users whose articles they want to read
-                 */
-
-//                // with your app's user model
-//                String msg = "@" + session.getUserName() + " logged in! (#" + result.data.getUserName() + ")";
-////                Toast.makeText(getActivity().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-//                Log.v("TwitterKit-Success", msg);
-//
             }
 
             @Override
@@ -68,8 +68,6 @@ public class LoginFragment extends Fragment {
             }
         };
         loginButton.setCallback(callback);
-
-        return rootView;
     }
 
     @Override

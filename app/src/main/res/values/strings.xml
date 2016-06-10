@@ -11,4 +11,6 @@
     <string name="headlines_hint">This is the main headlines</string>
     <string name="author_hint">Author</string>
     <string name="publication_hint">Publication Name</string>
+    <string name="select_friends">Select Friends</string>
+    <string name="please_pick_friends">Please pick atleast one friend!</string>
 </resources>

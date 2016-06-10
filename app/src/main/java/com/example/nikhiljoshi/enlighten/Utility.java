@@ -1,16 +1,22 @@
 package com.example.nikhiljoshi.enlighten;
 
+import android.content.ContentValues;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.example.nikhiljoshi.enlighten.data.Contract.EnlightenContract;
+import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.models.UrlEntity;
+import com.twitter.sdk.android.core.models.User;
 
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -60,16 +66,79 @@ public class Utility {
     }
 
     public static List<Tweet> filterTweetsWithLink(List<Tweet> tweets) {
+
         List<Tweet> tweetsWithLink = new ArrayList<>();
+
+        /**
+         * If a url has been been part of the tweet once already, any other tweets that
+         * contain that url can be ignored.
+         */
+        List<String> expandedUrls = new ArrayList<>();
+
         for (Tweet tweet : tweets) {
             List<UrlEntity> urls = tweet.entities.urls;
             if (urls.size() > 1) {
-                tweetsWithLink.add(tweet);
+                // if the url is not already a part of list
+                if (listDoesntContainAllUrls(expandedUrls, urls)) {
+                    tweetsWithLink.add(tweet);
+
+                    for (UrlEntity url: urls) {
+                        expandedUrls.add(url.expandedUrl);
+                    }
+
+                } else {
+                    tweetsWithLink = replaceWithOlderTweetWithSameUrls(tweetsWithLink, tweet);
+                }
+
             } else if (urls.size() == 1 && !urls.get(0).expandedUrl.contains("twitter")) {
-                tweetsWithLink.add(tweet);
+                if (!expandedUrls.contains(urls.get(0).expandedUrl)) {
+                    tweetsWithLink.add(tweet);
+                    expandedUrls.add(urls.get(0).expandedUrl);
+                } else {
+                    tweetsWithLink = replaceWithOlderTweetWithSameUrls(tweetsWithLink, tweet);
+                }
             }
         }
         return tweetsWithLink;
+    }
+
+    /**
+     * If a tweet is present in our list that contains all the urls, and we have encountered
+     * an older tweet that also contains all the urls, we will replace the tweet in the list with
+     * the older tweet
+     */
+    private static List<Tweet> replaceWithOlderTweetWithSameUrls(List<Tweet> tweetsWithLink,
+                                                          Tweet earlierTweet) {
+
+        List<String> urlsFromEarlierTweetWithSameUrls = getUrlsFromUrlEntities(earlierTweet.entities.urls);
+        List<Tweet> refreshedTweets = new ArrayList<>();
+        for (Tweet tweet : tweetsWithLink) {
+            List<String> tweetUrls = getUrlsFromUrlEntities(tweet.entities.urls);
+            if (!urlsFromEarlierTweetWithSameUrls.containsAll(tweetUrls)) {
+                refreshedTweets.add(tweet);
+            }
+        }
+        refreshedTweets.add(earlierTweet);
+
+        return refreshedTweets;
+
+    }
+
+    private static List<String> getUrlsFromUrlEntities(List<UrlEntity> urlEntities) {
+        List<String> urls = new ArrayList<>();
+        for  (UrlEntity url: urlEntities) {
+            urls.add(url.expandedUrl);
+        }
+        return urls;
+    }
+
+    private static boolean listDoesntContainAllUrls(List<String> expandedUrls, List<UrlEntity> urls) {
+        for (UrlEntity url: urls) {
+            if (!expandedUrls.contains(url.expandedUrl)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -143,4 +212,5 @@ public class Utility {
     public static String improveProfileImagePixel(String profileImageUrl){
         return profileImageUrl.replace("_normal.", ".");
     }
+
 }
