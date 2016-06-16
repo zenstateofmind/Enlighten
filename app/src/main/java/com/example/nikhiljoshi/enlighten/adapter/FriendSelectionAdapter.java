@@ -80,6 +80,8 @@ public class FriendSelectionAdapter extends RecyclerView.Adapter<FriendSelection
             }
             Picasso.with(profilePicture.getContext()).load(Utility.improveProfileImagePixel(user.profilePictureUrl))
                     .into(profilePicture);
+
+
             Log.i(LOG_TAG, " Username: " + user.userName + " Profile URL:" + user.profilePictureUrl);
             profileName.setText(user.profileName);
             this.user = user;
@@ -154,20 +156,21 @@ public class FriendSelectionAdapter extends RecyclerView.Adapter<FriendSelection
         long currentSessionUserId = Twitter.getSessionManager().getActiveSession().getUserId();
         Uri uriWithCurrentUserId = EnlightenContract.FriendEntry.buildFriendUriWithCurrentUserId(currentSessionUserId);
 
-        String selectionQuery = FriendEntry.COLUMN_PACK_KEY + " != ";
+        String selectionQuery = FriendEntry.COLUMN_PACK_KEY + " != ? OR " + FriendEntry.COLUMN_PACK_KEY + " IS NULL";
         String[] selectionArgs = new String[]{packId + ""};
 
         Cursor cursor = context.getContentResolver().query(uriWithCurrentUserId, null, selectionQuery, selectionArgs, null);
 
         if (!cursor.moveToFirst()) {
             Log.e(LOG_TAG, "The user hasn't chosen any friends! Weird... he should have chosen some.");
+        } else {
+
+            do {
+                friendsFromDb.add(EnlightenContract.FriendEntry.convertToFriend(cursor));
+            } while (cursor.moveToNext());
+
+            cursor.close();
         }
-
-        do {
-            friendsFromDb.add(EnlightenContract.FriendEntry.convertToFriend(cursor));
-        } while (cursor.moveToNext());
-
-        cursor.close();
 
         if (friends == null) {
             friends = new ArrayList<Friend>();

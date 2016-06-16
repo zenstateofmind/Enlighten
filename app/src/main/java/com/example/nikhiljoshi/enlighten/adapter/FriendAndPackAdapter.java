@@ -207,7 +207,7 @@ public class FriendAndPackAdapter extends RecyclerView.Adapter {
 
         public void bindView(Friend friend) {
             this.friend = friend;
-            Picasso.with(mProfilePicture.getContext()).load(Utility.improveProfileImagePixel(friend.profilePictureUrl))
+            Picasso.with(mProfilePicture.getContext()).load(Utility.improveProfileImagePixel(friend.profilePictureUrl)).fit()
                     .into(mProfilePicture);
             mProfileName.setText(friend.profileName);
         }

@@ -1,6 +1,7 @@
 package com.example.nikhiljoshi.enlighten.ui.Fragment;
 
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,10 @@ public class ArticlesFragment extends Fragment {
         Bundle arguments = getArguments();
         String userName = arguments.getString(FriendAndPackAdapter.USER_NAME);
         long userId = arguments.getLong(FriendAndPackAdapter.USER_ID);
+
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle(getActivity().getString(R.string.loading));
+        progressDialog.show();
 
         mArticleAdapter = new ArticleAdapter();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.articles_recycle_view);

@@ -9,6 +9,9 @@ import android.net.Uri;
 
 import com.example.nikhiljoshi.enlighten.data.EnlightenDbHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.nikhiljoshi.enlighten.data.Contract.EnlightenContract.*;
 
 /**
@@ -52,6 +55,7 @@ public class EnlightenProvider extends ContentProvider {
                 String selectionQuery = packId == -1 ? FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + FriendEntry.COLUMN_PACK_KEY + " IS NULL "
                                                 : FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + FriendEntry.COLUMN_PACK_KEY + " = ? ";
 
+
                 String[] selectionArgsQuery = packId == -1 ? new String[]{currentUserId + ""} : new String[]{currentUserId + "", packId + ""};
 
                 cursor = db.query(FriendEntry.TABLE_NAME,
@@ -66,10 +70,23 @@ public class EnlightenProvider extends ContentProvider {
             }
             case FRIENDS_WITH_CURRENT_USERID: {
                 Long currentUserId = FriendEntry.getCurrentUserIdFromFriendUri(uri);
+
+                String selectionQuery = selection == null ? FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? "
+                                                          : FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + selection;
+
+                String[] selectionArgsQuery = selectionArgs == null ? new String[1]
+                                                                    : new String[selectionArgs.length + 1];
+                selectionArgsQuery[0] = currentUserId + "";
+                if (selectionArgs != null) {
+                    for (int i = 0; i < selectionArgs.length; i++) {
+                        selectionArgsQuery[i + 1] = selectionArgs[i];
+                    }
+                }
+
                 cursor = db.query(FriendEntry.TABLE_NAME,
                         projection,
-                        FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? ",
-                        new String[]{currentUserId + ""},
+                        selectionQuery,
+                        selectionArgsQuery,
                         sortOrder,
                         null,
                         null);
