@@ -22,11 +22,7 @@
         </activity>
 
         <activity android:name=".ui.Activity.SelectFriendsActivity"
-            android:label="@string/title_activity_select_friends">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.Activity.LoginActivity" />
-        </activity>
+            android:label="@string/title_activity_select_friends" />
 
         <activity android:name=".ui.Activity.MainActivity"
             android:label="My Friends!">

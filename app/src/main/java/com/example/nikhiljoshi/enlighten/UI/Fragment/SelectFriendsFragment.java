@@ -44,6 +44,7 @@ public class SelectFriendsFragment extends Fragment {
     private Class mLaunchClass;
     private FriendSource friendSourceEnum;
     private Long packId;
+    private Long parentPackId;
 
     public enum FriendSource {
         DB, API
@@ -70,6 +71,7 @@ public class SelectFriendsFragment extends Fragment {
         mLaunchClass = ((ActivityToStartOnFriendSelection) arguments.getSerializable(ACTIVITY_TO_START_ON_FRIENDS_SELECTION_TAG)).launchClass;
         friendSourceEnum = (FriendSource) arguments.getSerializable(FRIEND_SOURCE_FOR_ADDING_NEW_FRIENDS_TAG);
         packId = arguments.getLong(ChosenFriendsFragment.PACK_ID_TAG);
+        parentPackId = arguments.getLong(PackActivity.PARENT_PACK_ID_TAG);
 
         mFriendSelectionAdapter = new FriendSelectionAdapter(getContext(), friendSourceEnum);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.select_friends_recycler_view);
@@ -78,7 +80,7 @@ public class SelectFriendsFragment extends Fragment {
         mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 
         if(friendSourceEnum == FriendSource.DB) {
-            mFriendSelectionAdapter.loadAllFriendsFromDb();
+            mFriendSelectionAdapter.loadAllFriendsFromDb(packId);
         } else if (friendSourceEnum == FriendSource.API) {
             MyTwitterApi api = new MyTwitterApi(getActivity().getApplicationContext());
             api.getFriendsListTake2(mFriendSelectionAdapter);
@@ -104,6 +106,7 @@ public class SelectFriendsFragment extends Fragment {
                     Intent intent = new Intent(getContext(), mLaunchClass);
                     if (mLaunchClass.getSimpleName().equals(PackActivity.class.getSimpleName())) {
                         intent.putExtra(ChosenFriendsFragment.PACK_ID_TAG, packId);
+                        intent.putExtra(PackActivity.PARENT_PACK_ID_TAG, parentPackId);
                     }
                     getActivity().finish();
                     startActivity(intent);

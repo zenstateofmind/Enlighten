@@ -150,5 +150,4 @@ public class ChosenFriendsFragment extends Fragment {
         return builder.create();
     }
 
-
 }

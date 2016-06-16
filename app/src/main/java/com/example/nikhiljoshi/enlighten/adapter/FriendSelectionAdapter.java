@@ -148,13 +148,16 @@ public class FriendSelectionAdapter extends RecyclerView.Adapter<FriendSelection
         notifyDataSetChanged();
     }
 
-    public void loadAllFriendsFromDb() {
+    public void loadAllFriendsFromDb(Long packId) {
 
         List<Friend> friendsFromDb = new ArrayList<>();
         long currentSessionUserId = Twitter.getSessionManager().getActiveSession().getUserId();
         Uri uriWithCurrentUserId = EnlightenContract.FriendEntry.buildFriendUriWithCurrentUserId(currentSessionUserId);
 
-        Cursor cursor = context.getContentResolver().query(uriWithCurrentUserId, null, null, null, null);
+        String selectionQuery = FriendEntry.COLUMN_PACK_KEY + " != ";
+        String[] selectionArgs = new String[]{packId + ""};
+
+        Cursor cursor = context.getContentResolver().query(uriWithCurrentUserId, null, selectionQuery, selectionArgs, null);
 
         if (!cursor.moveToFirst()) {
             Log.e(LOG_TAG, "The user hasn't chosen any friends! Weird... he should have chosen some.");
