@@ -24,6 +24,7 @@ public class EnlightenProvider extends ContentProvider {
     private static final int FRIEND = 105;
     private static final int PACK = 106;
     private static final int PACK_WITH_CURRENT_USERID_AND_PARENT_PACKID = 107;
+    private static final int PACK_WITH_CURRENT_USERID_AND_PACKID = 108;
 
     private EnlightenDbHelper mOpenHelper;
 
@@ -108,6 +109,17 @@ public class EnlightenProvider extends ContentProvider {
                                     projection,
                                     selectionQuery,
                                     selectionArgsQuery,
+                                    sortOrder,
+                                    null,
+                                    null);
+                break;
+            } case PACK_WITH_CURRENT_USERID_AND_PACKID: {
+                final long userId = PackEntry.getCurrentUserIdFromPackIdUri(uri);
+                final long packId = PackEntry.getPackIdFromPackIdUri(uri);
+                cursor = db.query(PackEntry.TABLE_NAME,
+                                    projection,
+                                    PackEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + PackEntry._ID + " = ? ",
+                                    new String[]{userId + "", packId + ""},
                                     sortOrder,
                                     null,
                                     null);
@@ -261,7 +273,9 @@ public class EnlightenProvider extends ContentProvider {
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_FRIEND + "/#" , FRIENDS_WITH_CURRENT_USERID);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_FRIEND + "/#/" + PATH_PACK + "/*", FRIENDS_WITH_CURRENT_USERID_AND_PACKID);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_FRIEND + "/#/*", FRIEND_WITH_CURRENT_USERID_AND_FRIEND_USER_ID);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PACK + "/#/" + PATH_PACK + "/*", PACK_WITH_CURRENT_USERID_AND_PACKID);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PACK + "/#/*", PACK_WITH_CURRENT_USERID_AND_PARENT_PACKID);
+
         return uriMatcher;
     }
 

@@ -132,6 +132,8 @@ public class FriendAndPackAdapter extends RecyclerView.Adapter {
             } while (cursor.moveToNext());
         }
 
+        cursor.close();
+
         return allPacks;
     }
 

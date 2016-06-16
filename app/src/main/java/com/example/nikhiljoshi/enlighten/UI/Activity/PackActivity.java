@@ -60,6 +60,7 @@ public class PackActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home: {
                 goToPreviousPage();
+//                finish();
             }
         }
         return super.onOptionsItemSelected(item);
@@ -68,6 +69,7 @@ public class PackActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         goToPreviousPage();
+//        finish();
 
         super.onBackPressed();
     }

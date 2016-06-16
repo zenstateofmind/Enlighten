@@ -175,6 +175,7 @@ public class EnlightenContract {
 
         public static Uri buildPackUriWithPackId(Long currentUserId, Long currentPackId) {
             return CONTENT_URI.buildUpon().appendPath(currentUserId + "")
+                    .appendPath(PATH_PACK)
                     .appendPath(currentPackId + "").build();
         }
 
@@ -194,7 +195,7 @@ public class EnlightenContract {
         }
 
         public static long getPackIdFromPackIdUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(2));
+            return Long.parseLong(uri.getPathSegments().get(3));
         }
 
         public static long getCurrentUserIdFromParentPackNameUri(Uri uri) {
@@ -232,7 +233,12 @@ public class EnlightenContract {
             final String packName = cursor.getString(packNameIndex);
             final String description = cursor.getString(descriptionIndex);
             final long currentPackId = cursor.getLong(currentPackIdIndex);
-            final long parentPackId = cursor.getLong(parentPackIdIndex);
+            long parentPackId;
+            if (cursor.isNull(parentPackIdIndex)) {
+                parentPackId = -1;
+            } else {
+                parentPackId = cursor.getLong(parentPackIdIndex);
+            }
 
             return new Pack(packName, description, parentPackId, currentPackId);
         }

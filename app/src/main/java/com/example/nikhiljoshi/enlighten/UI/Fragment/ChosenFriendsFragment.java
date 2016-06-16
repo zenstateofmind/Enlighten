@@ -95,6 +95,7 @@ public class ChosenFriendsFragment extends Fragment {
                 intent.putExtra(ACTIVITY_TO_START_ON_FRIENDS_SELECTION_TAG, activityToStartOnFriendSelectionEnum);
                 intent.putExtra(FRIEND_SOURCE_FOR_ADDING_NEW_FRIENDS_TAG, friendsSourceEnum);
                 intent.putExtra(PACK_ID_TAG, packId);
+                getActivity().finish();
                 getActivity().startActivity(intent);
                 return true;
             }
@@ -149,26 +150,5 @@ public class ChosenFriendsFragment extends Fragment {
         return builder.create();
     }
 
-    private void loadFriendsFromDb() {
-
-        List<Friend> friends = new ArrayList<>();
-        long currentSessionUserId = Twitter.getSessionManager().getActiveSession().getUserId();
-        Uri uriWithCurrentUserId = EnlightenContract.FriendEntry.buildUriWithCurrentUserIdAndPackId(currentSessionUserId, packId);
-
-        Cursor cursor = getContext().getContentResolver().query(uriWithCurrentUserId, null, null, null, null);
-
-        if (!cursor.moveToFirst()) {
-            Log.e(LOG_TAG, "The user hasn't chosen any friends! Weird... he should have chosen some.");
-        }
-
-        do {
-            friends.add(EnlightenContract.FriendEntry.convertToFriend(cursor));
-        } while (cursor.moveToNext());
-
-        cursor.close();
-
-        mFriendAndPackAdapter.addFriends(friends);
-
-    }
 
 }

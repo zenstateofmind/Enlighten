@@ -105,6 +105,7 @@ public class SelectFriendsFragment extends Fragment {
                     if (mLaunchClass.getSimpleName().equals(PackActivity.class.getSimpleName())) {
                         intent.putExtra(ChosenFriendsFragment.PACK_ID_TAG, packId);
                     }
+                    getActivity().finish();
                     startActivity(intent);
                 }
 
