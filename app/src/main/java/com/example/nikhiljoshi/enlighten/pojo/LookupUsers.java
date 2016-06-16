@@ -1,4 +1,4 @@
-package com.example.nikhiljoshi.enlighten.network.pojo;
+package com.example.nikhiljoshi.enlighten.pojo;
 
 /**
  * Created by nikhiljoshi on 5/30/16.

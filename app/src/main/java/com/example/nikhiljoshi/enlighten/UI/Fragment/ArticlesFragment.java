@@ -2,7 +2,6 @@ package com.example.nikhiljoshi.enlighten.ui.Fragment;
 
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,9 +11,8 @@ import android.view.ViewGroup;
 
 import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.adapter.ArticleAdapter;
-import com.example.nikhiljoshi.enlighten.adapter.FriendAdapter;
+import com.example.nikhiljoshi.enlighten.adapter.FriendAndPackAdapter;
 import com.example.nikhiljoshi.enlighten.network.MyTwitterApi;
-import com.twitter.sdk.android.tweetui.TweetViewFetchAdapter;
 
 /**
  * Created by nikhiljoshi on 5/28/16.
@@ -30,8 +28,8 @@ public class ArticlesFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_articles_view, container, false);
 
         Bundle arguments = getArguments();
-        String userName = arguments.getString(FriendAdapter.USER_NAME);
-        long userId = arguments.getLong(FriendAdapter.USER_ID);
+        String userName = arguments.getString(FriendAndPackAdapter.USER_NAME);
+        long userId = arguments.getLong(FriendAndPackAdapter.USER_ID);
 
         mArticleAdapter = new ArticleAdapter();
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.articles_recycle_view);

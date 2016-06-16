@@ -7,13 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.nikhiljoshi.enlighten.R;
-import com.example.nikhiljoshi.enlighten.Utility;
-import com.example.nikhiljoshi.enlighten.network.MyTwitterApiClient;
-import com.example.nikhiljoshi.enlighten.network.pojo.FriendsInfo;
 import com.example.nikhiljoshi.enlighten.ui.Activity.MainActivity;
 import com.example.nikhiljoshi.enlighten.ui.Activity.SelectFriendsActivity;
 import com.twitter.sdk.android.Twitter;
@@ -22,13 +17,6 @@ import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
-import com.twitter.sdk.android.core.models.Tweet;
-import com.twitter.sdk.android.core.models.User;
-import com.twitter.sdk.android.tweetui.TweetView;
-
-import java.util.List;
-
-import static com.twitter.sdk.android.tweetui.TweetUtils.*;
 
 /**
  * Created by nikhiljoshi on 5/5/16.
@@ -43,13 +31,13 @@ public class LoginFragment extends Fragment {
 
         TwitterSession activeSession = Twitter.getSessionManager().getActiveSession();
 
-//        if (activeSession != null) {
-//            Intent intent = new Intent(getContext(), MainActivity.class);
-//            startActivity(intent);
-//        } else {
+        if (activeSession != null) {
+            Intent intent = new Intent(getContext(), MainActivity.class);
+            startActivity(intent);
+        } else {
             loginButton = (TwitterLoginButton) rootView.findViewById(R.id.twitter_login_button2);
             login();
-//        }
+        }
 
         return rootView;
     }

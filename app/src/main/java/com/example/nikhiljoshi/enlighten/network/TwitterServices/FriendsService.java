@@ -1,11 +1,7 @@
 package com.example.nikhiljoshi.enlighten.network.TwitterServices;
 
-import com.example.nikhiljoshi.enlighten.network.pojo.FriendIds;
-import com.example.nikhiljoshi.enlighten.network.pojo.FriendsInfo;
-import com.twitter.sdk.android.core.models.Tweet;
-import com.twitter.sdk.android.core.models.User;
-
-import java.util.List;
+import com.example.nikhiljoshi.enlighten.pojo.FriendIds;
+import com.example.nikhiljoshi.enlighten.pojo.FriendsInfo;
 
 import retrofit.Callback;
 import retrofit.http.GET;

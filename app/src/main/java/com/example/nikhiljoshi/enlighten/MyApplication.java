@@ -1,7 +1,9 @@
 package com.example.nikhiljoshi.enlighten;
 
 import android.app.Application;
+import android.content.Context;
 
+import com.facebook.stetho.Stetho;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 
@@ -24,5 +26,11 @@ public class MyApplication extends Application {
                 BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
 
         Fabric.with(this, new Twitter(authConfig));
+
+        final Context context = this;
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(context)
+                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(context))
+                        .build());
     }
 }

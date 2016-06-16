@@ -1,26 +1,38 @@
 package com.example.nikhiljoshi.enlighten.ui.Fragment;
 
+import android.app.Dialog;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.nikhiljoshi.enlighten.R;
-import com.example.nikhiljoshi.enlighten.adapter.FriendAdapter;
+import com.example.nikhiljoshi.enlighten.adapter.FriendAndPackAdapter;
 import com.example.nikhiljoshi.enlighten.data.Contract.EnlightenContract;
-import com.example.nikhiljoshi.enlighten.network.pojo.Friend;
-import com.example.nikhiljoshi.enlighten.ui.Activity.SwapFragments;
+import com.example.nikhiljoshi.enlighten.pojo.Friend;
+import com.example.nikhiljoshi.enlighten.ui.Activity.SelectFriendsActivity;
 import com.twitter.sdk.android.Twitter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.nikhiljoshi.enlighten.ui.Fragment.SelectFriendsFragment.*;
 
 /**
  * Created by nikhiljoshi on 6/7/16.
@@ -28,35 +40,121 @@ import java.util.List;
 public class ChosenFriendsFragment extends Fragment {
 
     private static final String LOG_TAG = ChosenFriendsFragment.class.getSimpleName();
+    public static final String PACK_ID_TAG = "pack_id_tag";
     private RecyclerView mRecyclerView;
-    private FriendAdapter mFriendAdapter;
+    private FriendAndPackAdapter mFriendAndPackAdapter;
+    private Long packId;
+    private ActivityToStartOnFriendSelection activityToStartOnFriendSelectionEnum;
+    private FriendSource friendsSourceEnum;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        setHasOptionsMenu(true);
+
+        final Bundle arguments = getArguments();
+        activityToStartOnFriendSelectionEnum =
+                (ActivityToStartOnFriendSelection) arguments.getSerializable(ACTIVITY_TO_START_ON_FRIENDS_SELECTION_TAG);
+
+        friendsSourceEnum = (FriendSource) arguments.getSerializable(FRIEND_SOURCE_FOR_ADDING_NEW_FRIENDS_TAG);
+        packId = arguments.getLong(PACK_ID_TAG);
+
         View rootView = inflater.inflate(R.layout.fragment_chosen_friends, container, false);
-
-        mFriendAdapter = new FriendAdapter(getActivity());
-
-        loadFriendsFromDb();
-
+        mFriendAndPackAdapter = new FriendAndPackAdapter(getActivity());
+        mFriendAndPackAdapter.loadFriendsFromDb(packId);
+        mFriendAndPackAdapter.loadPacksFromDb(packId);
+        //TODO: Add a method to load packs
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.chosen_friends_recyclerView);
-        mRecyclerView.setAdapter(mFriendAdapter);
+        mRecyclerView.setAdapter(mFriendAndPackAdapter);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.add_pack_friends_menu, menu);
+        if (packId != -1) {
+            final MenuItem addFriendsOption = menu.findItem(R.id.add_friends);
+            addFriendsOption.setTitle("Move friends to Pack");
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO: If packId = -1, show add_friends, else show 'Move Friends To This Pack'
+        switch (item.getItemId()) {
+            case R.id.add_pack: {
+                final Dialog addPackDialog = createAddPackDialog();
+                addPackDialog.show();
+                return true;
+            } case R.id.add_friends: {
+                Intent intent = new Intent(getContext(), SelectFriendsActivity.class);
+                intent.putExtra(ACTIVITY_TO_START_ON_FRIENDS_SELECTION_TAG, activityToStartOnFriendSelectionEnum);
+                intent.putExtra(FRIEND_SOURCE_FOR_ADDING_NEW_FRIENDS_TAG, friendsSourceEnum);
+                intent.putExtra(PACK_ID_TAG, packId);
+                getActivity().startActivity(intent);
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * Create the dialog box that allows users to add new packs
+     */
+    private Dialog createAddPackDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        final View dialogView = inflater.inflate(R.layout.add_pack_dialog, null);
+        final EditText packNameEditText =
+                (EditText) dialogView.findViewById(R.id.pack_name);
+        final EditText packDescrEditText =
+                (EditText) dialogView.findViewById(R.id.pack_description);
+
+        builder.setView(dialogView)
+                .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final String packName = packNameEditText.getText().toString();
+                        final String packDescr = packDescrEditText.getText().toString();
+                        if (packName == null || packName.trim().isEmpty() ||
+                                packDescr == null || packDescr.trim().isEmpty()) {
+                            Toast.makeText(getContext(), getString(R.string.fields_cannot_be_empty), Toast.LENGTH_LONG).show();
+                            dialog.cancel();
+                        } else {
+                            Toast.makeText(getContext(), getString(R.string.created_a_pack), Toast.LENGTH_LONG).show();
+                            final ContentValues packData = EnlightenContract.PackEntry.getContentValues(packName, packDescr, packId /*parent pack id */);
+                            final Uri uri = getContext().getContentResolver().insert(EnlightenContract.PackEntry.CONTENT_URI, packData);
+                            final long packInsertedRowId = ContentUris.parseId(uri);
+                            if (packInsertedRowId == -1) {
+                                Log.e(LOG_TAG, "Problem inserting data into the pack table");
+                            }
+                            mFriendAndPackAdapter.loadPacksFromDb(packId);
+
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        return builder.create();
+    }
+
     private void loadFriendsFromDb() {
 
         List<Friend> friends = new ArrayList<>();
         long currentSessionUserId = Twitter.getSessionManager().getActiveSession().getUserId();
-        Uri uriWithCurrentUserId = EnlightenContract.FriendEntry.buildFriendUriWithCurrentUserId(currentSessionUserId);
+        Uri uriWithCurrentUserId = EnlightenContract.FriendEntry.buildUriWithCurrentUserIdAndPackId(currentSessionUserId, packId);
 
-        //@NonNull Uri uri, @Nullable String[] projection,
-        //@Nullable String selection, @Nullable String[] selectionArgs,
-        //@Nullable String sortOrder
         Cursor cursor = getContext().getContentResolver().query(uriWithCurrentUserId, null, null, null, null);
 
         if (!cursor.moveToFirst()) {
@@ -67,14 +165,10 @@ public class ChosenFriendsFragment extends Fragment {
             friends.add(EnlightenContract.FriendEntry.convertToFriend(cursor));
         } while (cursor.moveToNext());
 
-        mFriendAdapter.addFriends(friends);
+        cursor.close();
+
+        mFriendAndPackAdapter.addFriends(friends);
 
     }
-
-    public boolean goHome() {
-        return true;
-    }
-
-
 
 }

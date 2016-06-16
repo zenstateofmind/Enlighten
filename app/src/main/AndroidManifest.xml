@@ -33,11 +33,11 @@
         </activity>
 
         <activity android:name=".ui.Activity.ArticleActivity"
-            android:label="Tweets">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.Activity.MainActivity" />
-        </activity>
+            android:label="Tweets"/>
+
+        <activity android:name=".ui.Activity.PackActivity"
+            android:label = "Pack" />
+
         <provider
             android:authorities="com.example.nikhiljoshi.enlighten"
             android:name=".data.Provider.EnlightenProvider" />

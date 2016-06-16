@@ -19,12 +19,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.nikhiljoshi.enlighten.R;
-import com.example.nikhiljoshi.enlighten.adapter.UsersAdapter;
+import com.example.nikhiljoshi.enlighten.adapter.FriendSelectionAdapter;
 import com.example.nikhiljoshi.enlighten.data.Contract.EnlightenContract;
 import com.example.nikhiljoshi.enlighten.network.MyTwitterApi;
+import com.example.nikhiljoshi.enlighten.pojo.Friend;
 import com.example.nikhiljoshi.enlighten.ui.Activity.MainActivity;
+import com.example.nikhiljoshi.enlighten.ui.Activity.PackActivity;
 import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.models.User;
 
 import java.util.List;
 
@@ -33,10 +34,31 @@ import java.util.List;
  */
 public class SelectFriendsFragment extends Fragment {
 
+    public static final String ACTIVITY_TO_START_ON_FRIENDS_SELECTION_TAG = "activity_to_start_on_selection";
+    public static final String FRIEND_SOURCE_FOR_ADDING_NEW_FRIENDS_TAG = "chose_from_db_or_api";
+
     private static final String LOG_TAG = SelectFriendsFragment.class.getSimpleName();
 
-    private UsersAdapter mUsersAdapter;
+    private FriendSelectionAdapter mFriendSelectionAdapter;
     private RecyclerView mRecyclerView;
+    private Class mLaunchClass;
+    private FriendSource friendSourceEnum;
+    private Long packId;
+
+    public enum FriendSource {
+        DB, API
+    }
+
+    public enum ActivityToStartOnFriendSelection {
+        MAIN_ACTIVITY(MainActivity.class),
+        PACK_ACTIVITY(PackActivity.class);
+
+        public final Class launchClass;
+
+        ActivityToStartOnFriendSelection(Class startClass) {
+            this.launchClass = startClass;
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,32 +66,23 @@ public class SelectFriendsFragment extends Fragment {
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.fragment_select_friends, container, false);
 
-        mUsersAdapter = new UsersAdapter();
+        final Bundle arguments = getArguments();
+        mLaunchClass = ((ActivityToStartOnFriendSelection) arguments.getSerializable(ACTIVITY_TO_START_ON_FRIENDS_SELECTION_TAG)).launchClass;
+        friendSourceEnum = (FriendSource) arguments.getSerializable(FRIEND_SOURCE_FOR_ADDING_NEW_FRIENDS_TAG);
+        packId = arguments.getLong(ChosenFriendsFragment.PACK_ID_TAG);
+
+        mFriendSelectionAdapter = new FriendSelectionAdapter(getContext(), friendSourceEnum);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.select_friends_recycler_view);
-        mRecyclerView.setAdapter(mUsersAdapter);
+        mRecyclerView.setAdapter(mFriendSelectionAdapter);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 
-//        TwitterSession session = Twitter.getSessionManager().getActiveSession();
-//        MyTwitterApiClient apiClient = new MyTwitterApiClient(session);
-//        apiClient.getFriendsService().list(session.getUserId(), new Callback<FriendsInfo>() {
-//            @Override
-//            public void success(Result<FriendsInfo> result) {
-//                Toast.makeText(getActivity().getApplicationContext(),
-//                        "Number of friends: " + result.data.users.size(), Toast.LENGTH_LONG).show();
-//
-//            }
-//
-//            @Override
-//            public void failure(TwitterException e) {
-//
-//            }
-//        });
-
-        MyTwitterApi api = new MyTwitterApi(getActivity().getApplicationContext());
-        api.getFriendsListTake2(mUsersAdapter);
-
-//        api.get(5943622L);
+        if(friendSourceEnum == FriendSource.DB) {
+            mFriendSelectionAdapter.loadAllFriendsFromDb();
+        } else if (friendSourceEnum == FriendSource.API) {
+            MyTwitterApi api = new MyTwitterApi(getActivity().getApplicationContext());
+            api.getFriendsListTake2(mFriendSelectionAdapter);
+        }
 
         return rootView;
     }
@@ -83,12 +96,16 @@ public class SelectFriendsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.select_friends: {
-                List<User> selectedFriends = mUsersAdapter.getSelectedFriends();
+                List<Friend> selectedFriends = mFriendSelectionAdapter.getSelectedFriends();
                 if (selectedFriends.size() < 1) {
                     Toast.makeText(getContext(), R.string.please_pick_friends, Toast.LENGTH_LONG).show();
                 } else {
                     saveFriendsInfoInDb(selectedFriends);
-                    goToNextPage();
+                    Intent intent = new Intent(getContext(), mLaunchClass);
+                    if (mLaunchClass.getSimpleName().equals(PackActivity.class.getSimpleName())) {
+                        intent.putExtra(ChosenFriendsFragment.PACK_ID_TAG, packId);
+                    }
+                    startActivity(intent);
                 }
 
                 return true;
@@ -98,21 +115,14 @@ public class SelectFriendsFragment extends Fragment {
 
     }
 
-    private void goToNextPage() {
-        Intent intent = new Intent(getContext(), MainActivity.class);
-        startActivity(intent);
-
-    }
-
-    private void saveFriendsInfoInDb(List<User> users) {
-        for (User user: users) {
-            ContentValues contentValues = EnlightenContract.FriendEntry.getContentValues(user);
-            Uri insertingUri = EnlightenContract.FriendEntry.CONTENT_URI;
-            Uri insertedUri = getContext().getContentResolver().insert(insertingUri, contentValues);
-            long inserted_row_id = ContentUris.parseId(insertedUri);
-            if (inserted_row_id == -1) {
-                Log.e(LOG_TAG, "Could not insert info about user: " + user.name);
+    private void saveFriendsInfoInDb(List<Friend> users) {
+        for (Friend user: users) {
+            if (friendSourceEnum == FriendSource.API) {
+                insertFriendInDb(user);
+            } else if (friendSourceEnum == FriendSource.DB) {
+                updateFriendInDb(user);
             }
+
         }
 
         ////// Remove the next set of code... just to ensure that info was added to db /////
@@ -123,12 +133,36 @@ public class SelectFriendsFragment extends Fragment {
         int numFriendsAdded = 0;
         if (!cursor.moveToFirst()) {
             Log.e(LOG_TAG, "The user hasn't chosen any friends! Weird... he should have chosen some.");
+        } else {
+
+            do {
+                numFriendsAdded++;
+            } while (cursor.moveToNext());
         }
 
-        do {
-            numFriendsAdded++;
-        } while (cursor.moveToNext());
+        cursor.close();
 
         Log.i(LOG_TAG, "Added " + numFriendsAdded + " friends to the db! Good job!");
+    }
+
+    private void updateFriendInDb(Friend user) {
+        ContentValues contentValues = EnlightenContract.FriendEntry.getContentValues(user, packId);
+        final long currentUserId = Twitter.getSessionManager().getActiveSession().getUserId();
+        final Uri uri = EnlightenContract.FriendEntry.buildUriWithCurrentUserIdAndFriendUserId(currentUserId, user.userId);
+        final int numRowsUpdated = getContext().getContentResolver().update(uri, contentValues, null, null);
+        if (numRowsUpdated == 0) {
+            Log.e(LOG_TAG, "There were problems updating user: " + user.userName + " to packId: " + packId);
+        }
+
+    }
+
+    private void insertFriendInDb(Friend user) {
+        ContentValues contentValues = EnlightenContract.FriendEntry.getContentValues(user, packId);
+        Uri insertingUri = EnlightenContract.FriendEntry.CONTENT_URI;
+        Uri insertedUri = getContext().getContentResolver().insert(insertingUri, contentValues);
+        long inserted_row_id = ContentUris.parseId(insertedUri);
+        if (inserted_row_id == -1) {
+            Log.e(LOG_TAG, "Could not insert info about user: " + user.profileName);
+        }
     }
 }

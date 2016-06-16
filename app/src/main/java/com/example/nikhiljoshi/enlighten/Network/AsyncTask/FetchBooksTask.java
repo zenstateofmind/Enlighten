@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.example.nikhiljoshi.enlighten.adapter.DataSwappableAdapter;
 import com.example.nikhiljoshi.enlighten.network.NytApi;
-import com.example.nikhiljoshi.enlighten.network.pojo.Book;
+import com.example.nikhiljoshi.enlighten.pojo.Book;
 
 import java.util.Arrays;
 import java.util.Date;

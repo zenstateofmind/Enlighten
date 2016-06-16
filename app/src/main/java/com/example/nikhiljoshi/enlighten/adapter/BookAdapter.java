@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.Utility;
-import com.example.nikhiljoshi.enlighten.network.pojo.Book;
-import com.example.nikhiljoshi.enlighten.network.pojo.BookDetails;
+import com.example.nikhiljoshi.enlighten.pojo.Book;
+import com.example.nikhiljoshi.enlighten.pojo.BookDetails;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

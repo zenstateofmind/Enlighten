@@ -13,4 +13,12 @@
     <string name="publication_hint">Publication Name</string>
     <string name="select_friends">Select Friends</string>
     <string name="please_pick_friends">Please pick atleast one friend!</string>
+    <string name="add_pack">Add pack</string>
+    <string name="pack_name">Name of the Pack</string>
+    <string name="pack_description">Description of Pack</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="created_a_pack">Created the pack!</string>
+    <string name="fields_cannot_be_empty">Some fields are empty!</string>
+    <string name="add_friends">Add friends</string>
 </resources>

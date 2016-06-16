@@ -18,8 +18,12 @@ public class EnlightenProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final int FRIENDS_WITH_CURRENT_USERID = 100;
-    private static final int FRIEND_WITH_CURRENT_USERID_AND_USERNAME = 101;
-    private static final int FRIEND = 102;
+    private static final int FRIEND_WITH_CURRENT_USERID_AND_FRIEND_USER_ID = 101;
+    private static final int FRIENDS_WITH_CURRENT_USERID_AND_PACKID = 102;
+    private static final int PACKS_WITH_CURRENT_USERID = 103;
+    private static final int FRIEND = 105;
+    private static final int PACK = 106;
+    private static final int PACK_WITH_CURRENT_USERID_AND_PARENT_PACKID = 107;
 
     private EnlightenDbHelper mOpenHelper;
 
@@ -38,8 +42,29 @@ public class EnlightenProvider extends ContentProvider {
         Cursor cursor;
 
         switch (match) {
+            case FRIENDS_WITH_CURRENT_USERID_AND_PACKID: {
+                Long currentUserId = FriendEntry.getCurrentUserIdFromPackUri(uri);
+                Long packId = FriendEntry.getPackIdFromPackUri(uri);
+
+                // Android has this weird issue where you cannot query null in the database for some weird reason.
+                // Hence hashing out the logic right here, before inserting the information into the query
+                String selectionQuery = packId == -1 ? FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + FriendEntry.COLUMN_PACK_KEY + " IS NULL "
+                                                : FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + FriendEntry.COLUMN_PACK_KEY + " = ? ";
+
+                String[] selectionArgsQuery = packId == -1 ? new String[]{currentUserId + ""} : new String[]{currentUserId + "", packId + ""};
+
+                cursor = db.query(FriendEntry.TABLE_NAME,
+                        projection,
+                        selectionQuery,
+                        selectionArgsQuery,
+                        sortOrder,
+                        null,
+                        null);
+
+                break;
+            }
             case FRIENDS_WITH_CURRENT_USERID: {
-                Long currentUserId = FriendEntry.getCurrentUserIdFromUri(uri);
+                Long currentUserId = FriendEntry.getCurrentUserIdFromFriendUri(uri);
                 cursor = db.query(FriendEntry.TABLE_NAME,
                         projection,
                         FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? ",
@@ -49,19 +74,43 @@ public class EnlightenProvider extends ContentProvider {
                         null);
 
                 break;
-            } case FRIEND_WITH_CURRENT_USERID_AND_USERNAME: {
-                Long currentUserId = FriendEntry.getCurrentUserIdFromUri(uri);
-                String friendUserName = FriendEntry.getFriendUsernameFromUri(uri);
+            } case FRIEND_WITH_CURRENT_USERID_AND_FRIEND_USER_ID: {
+                Long currentUserId = FriendEntry.getCurrentUserIdFromFriendUri(uri);
+                long friendUserId = FriendEntry.getFriendUserIDFromFriendUri(uri);
 
                 cursor = db.query(FriendEntry.TABLE_NAME,
                         projection,
                         FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " +
-                                FriendEntry.COLUMN_USER_NAME + " = ?",
-                        new String[]{currentUserId + "", friendUserName},
+                                FriendEntry.COLUMN_USER_ID + " = ?",
+                        new String[]{currentUserId + "", friendUserId + ""},
                         sortOrder,
                         null,
                         null);
 
+                break;
+            } case PACKS_WITH_CURRENT_USERID: {
+                Long currentUserId = PackEntry.getCurrentUserIdFromPackUri(uri);
+                cursor = db.query(PackEntry.TABLE_NAME,
+                                  projection,
+                                  PackEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? ",
+                                  new String[]{currentUserId + ""},
+                                  sortOrder,
+                                  null,
+                                  null);
+                break;
+            } case PACK_WITH_CURRENT_USERID_AND_PARENT_PACKID: {
+                final long currentUserId = PackEntry.getCurrentUserIdFromParentPackIdUri(uri);
+                final long parentPackId = PackEntry.getParentPackIdFromParentPackIdUri(uri);
+                String selectionQuery = parentPackId == -1 ? PackEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + PackEntry.COLUMN_PACK_PARENT_ID + " IS NULL "
+                                                           : PackEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + PackEntry.COLUMN_PACK_PARENT_ID + " = ? ";
+                String[] selectionArgsQuery = parentPackId == -1 ? new String[]{currentUserId + ""} : new String[] {currentUserId + "", parentPackId + ""};
+                cursor = db.query(PackEntry.TABLE_NAME,
+                                    projection,
+                                    selectionQuery,
+                                    selectionArgsQuery,
+                                    sortOrder,
+                                    null,
+                                    null);
                 break;
             } default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -80,8 +129,12 @@ public class EnlightenProvider extends ContentProvider {
         switch (match) {
             case FRIENDS_WITH_CURRENT_USERID:
                 return FriendEntry.CONTENT_TYPE;
-            case FRIEND_WITH_CURRENT_USERID_AND_USERNAME:
+            case FRIEND_WITH_CURRENT_USERID_AND_FRIEND_USER_ID:
                 return FriendEntry.CONTENT_ITEM_TYPE;
+            case FRIENDS_WITH_CURRENT_USERID_AND_PACKID:
+                return FriendEntry.CONTENT_TYPE;
+            case PACKS_WITH_CURRENT_USERID:
+                return PackEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Uri: " + uri + " doesnt have a type");
         }
@@ -105,6 +158,14 @@ public class EnlightenProvider extends ContentProvider {
                 }
                 break;
 
+            } case PACK: {
+                long id = db.insert(PackEntry.TABLE_NAME, null, values);
+                if (id > 0) {
+                    returnUri = PackEntry.buildPackUriWithInsertedRowId(id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row for: " + uri);
+                }
+                break;
             } default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
@@ -124,18 +185,24 @@ public class EnlightenProvider extends ContentProvider {
 
         switch (match) {
             case FRIENDS_WITH_CURRENT_USERID : {
-                Long currentUserId = FriendEntry.getCurrentUserIdFromUri(uri);
+                Long currentUserId = FriendEntry.getCurrentUserIdFromFriendUri(uri);
                 numRowsDeleted = db.delete(FriendEntry.TABLE_NAME,
                         FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ?",
                         new String[]{currentUserId + ""});
                 break;
-            } case FRIEND_WITH_CURRENT_USERID_AND_USERNAME : {
-                Long currentUserId = FriendEntry.getCurrentUserIdFromUri(uri);
-                String friendUserName = FriendEntry.getFriendUsernameFromUri(uri);
+            } case FRIEND_WITH_CURRENT_USERID_AND_FRIEND_USER_ID: {
+                long currentUserId = FriendEntry.getCurrentUserIdFromFriendUri(uri);
+                long friendUserId = FriendEntry.getFriendUserIDFromFriendUri(uri);
                 numRowsDeleted = db.delete(FriendEntry.TABLE_NAME,
                         FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " +
-                                FriendEntry.COLUMN_USER_NAME + " = ? ",
-                        new String[]{currentUserId + "", friendUserName});
+                                FriendEntry.COLUMN_USER_ID + " = ? ",
+                        new String[]{currentUserId + "", friendUserId + ""});
+                break;
+            } case PACKS_WITH_CURRENT_USERID: {
+                Long currentUserId = PackEntry.getCurrentUserIdFromPackUri(uri);
+                numRowsDeleted = db.delete(PackEntry.TABLE_NAME,
+                          PackEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ?" ,
+                          new String[]{currentUserId + ""});
                 break;
             } default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -158,20 +225,20 @@ public class EnlightenProvider extends ContentProvider {
 
         switch (match) {
             case FRIENDS_WITH_CURRENT_USERID : {
-                Long currentUserId = FriendEntry.getCurrentUserIdFromUri(uri);
+                Long currentUserId = FriendEntry.getCurrentUserIdFromFriendUri(uri);
                 numRowsUpdated = db.update(FriendEntry.TABLE_NAME,
                         values,
                         FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ?",
                         new String[]{currentUserId + ""});
                 break;
-            } case FRIEND_WITH_CURRENT_USERID_AND_USERNAME : {
-                Long currentUserId = FriendEntry.getCurrentUserIdFromUri(uri);
-                String friendUserName = FriendEntry.getFriendUsernameFromUri(uri);
+            } case FRIEND_WITH_CURRENT_USERID_AND_FRIEND_USER_ID: {
+                Long currentUserId = FriendEntry.getCurrentUserIdFromFriendUri(uri);
+                Long friendUserId = FriendEntry.getFriendUserIDFromFriendUri(uri);
                 numRowsUpdated = db.update(FriendEntry.TABLE_NAME,
                         values,
                         FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " +
-                                FriendEntry.COLUMN_USER_NAME + " = ? ",
-                        new String[]{currentUserId + "", friendUserName});
+                                FriendEntry.COLUMN_USER_ID + " = ? ",
+                        new String[]{currentUserId + "", friendUserId + ""});
                 break;
             } default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -189,8 +256,12 @@ public class EnlightenProvider extends ContentProvider {
     private static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_FRIEND, FRIEND);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PACK, PACK);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PACK + "/#", PACKS_WITH_CURRENT_USERID);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_FRIEND + "/#" , FRIENDS_WITH_CURRENT_USERID);
-        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_FRIEND + "/#/*", FRIEND_WITH_CURRENT_USERID_AND_USERNAME);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_FRIEND + "/#/" + PATH_PACK + "/*", FRIENDS_WITH_CURRENT_USERID_AND_PACKID);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_FRIEND + "/#/*", FRIEND_WITH_CURRENT_USERID_AND_FRIEND_USER_ID);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PACK + "/#/*", PACK_WITH_CURRENT_USERID_AND_PARENT_PACKID);
         return uriMatcher;
     }
 

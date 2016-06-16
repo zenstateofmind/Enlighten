@@ -1,4 +1,4 @@
-package com.example.nikhiljoshi.enlighten.network.pojo;
+package com.example.nikhiljoshi.enlighten.pojo;
 
 import android.os.Parcel;
 import android.os.Parcelable;

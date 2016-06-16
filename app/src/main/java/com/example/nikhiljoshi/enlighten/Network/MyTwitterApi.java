@@ -7,9 +7,9 @@ import android.widget.Toast;
 
 import com.example.nikhiljoshi.enlighten.Utility;
 import com.example.nikhiljoshi.enlighten.adapter.ArticleAdapter;
-import com.example.nikhiljoshi.enlighten.adapter.UsersAdapter;
-import com.example.nikhiljoshi.enlighten.network.pojo.FriendIds;
-import com.example.nikhiljoshi.enlighten.network.pojo.FriendsInfo;
+import com.example.nikhiljoshi.enlighten.adapter.FriendSelectionAdapter;
+import com.example.nikhiljoshi.enlighten.pojo.FriendIds;
+import com.example.nikhiljoshi.enlighten.pojo.FriendsInfo;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -40,12 +40,12 @@ public class MyTwitterApi {
         twitterApiClient = Twitter.getApiClient();
     }
 
-    public void getFriends(UsersAdapter usersAdapter) {
+    public void getFriends(FriendSelectionAdapter friendSelectionAdapter) {
         final List<User> friends = new ArrayList<>();
-        getFriendsList(usersAdapter, -1L, 2);
+        getFriendsList(friendSelectionAdapter, -1L, 2);
     }
 
-    private void getFriendsList(final UsersAdapter usersAdapter, long next_cursor, final int countDown) {
+    private void getFriendsList(final FriendSelectionAdapter friendSelectionAdapter, long next_cursor, final int countDown) {
         myTwitterApiClient.getFriendsService().list(twitterSession.getUserId(), next_cursor, new Callback<FriendsInfo>() {
             @Override
             public void success(Result<FriendsInfo> result) {
@@ -53,9 +53,9 @@ public class MyTwitterApi {
                 for (User friend : friends) {
 //                    getUserTweetsWithLinks(friend.id, friend.name);
                 }
-                usersAdapter.addUsers(friends);
+                friendSelectionAdapter.addUsersFromApi(friends);
                 if (countDown > 0) {
-                    getFriendsList(usersAdapter, result.data.nextCursor, countDown - 1);
+                    getFriendsList(friendSelectionAdapter, result.data.nextCursor, countDown - 1);
                     Log.i(LOG, "Next cursor: " + result.data.nextCursor);
                 }
                 Toast.makeText(context, "Number of friends: " + friends.size(), Toast.LENGTH_LONG).show();
@@ -68,12 +68,12 @@ public class MyTwitterApi {
         });
     }
 
-    public void getFriendsListTake2(final UsersAdapter usersAdapter) {
+    public void getFriendsListTake2(final FriendSelectionAdapter friendSelectionAdapter) {
         myTwitterApiClient.getFriendsService().ids(twitterSession.getUserId(), null, 5000, new Callback<FriendIds>() {
             @Override
             public void success(Result<FriendIds> result) {
                 List<Long> ids = result.data.ids;
-                getUserInfoFromIds(ids, usersAdapter);
+                getUserInfoFromIds(ids, friendSelectionAdapter);
             }
 
             @Override
@@ -83,7 +83,7 @@ public class MyTwitterApi {
         });
     }
 
-    private void getUserInfoFromIds(List<Long> friendIds, final UsersAdapter usersAdapter) {
+    private void getUserInfoFromIds(List<Long> friendIds, final FriendSelectionAdapter friendSelectionAdapter) {
 
         int numUsersPerRequest = 100;
         // /users/lookup.json takes a max of 100 comma separated user ids
@@ -98,7 +98,7 @@ public class MyTwitterApi {
             myTwitterApiClient.getUsersService().lookup(commaSeparatedSubsetOfIds, new Callback<List<User>>() {
                 @Override
                 public void success(Result<List<User>> result) {
-                    usersAdapter.addUsers(result.data);
+                    friendSelectionAdapter.addUsersFromApi(result.data);
                 }
 
                 @Override
@@ -121,10 +121,6 @@ public class MyTwitterApi {
                         if (tweets.size() > 0) {
                             Log.i(LOG, "Tweet by username " + userName + " and the first tweet is: " + tweets.get(0).text );
                         }
-
-
-//                        TweetToArticleInfoTask task = new TweetToArticleInfoTask(articleAdapter);
-//                        task.execute(tweets);
                         articleAdapter.addArticleRelatedTweets(tweets);
                     }
 

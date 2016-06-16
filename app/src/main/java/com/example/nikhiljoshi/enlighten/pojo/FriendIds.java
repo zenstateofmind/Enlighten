@@ -1,4 +1,4 @@
-package com.example.nikhiljoshi.enlighten.network.pojo;
+package com.example.nikhiljoshi.enlighten.pojo;
 
 import com.google.gson.annotations.SerializedName;
 

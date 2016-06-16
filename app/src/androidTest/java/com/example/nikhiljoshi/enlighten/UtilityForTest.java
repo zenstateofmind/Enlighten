@@ -5,9 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.nikhiljoshi.enlighten.data.Contract.EnlightenContract;
 import com.example.nikhiljoshi.enlighten.data.EnlightenDbHelper;
-import com.example.nikhiljoshi.enlighten.data.Provider.EnlightenProvider;
 
 import java.util.Map;
 import java.util.Set;
@@ -32,9 +30,10 @@ public class UtilityForTest {
 
     public static ContentValues createSamplePackData() {
         ContentValues contentValues = new ContentValues();
+        contentValues.put(PackEntry.COLUMN_CURRENT_SESSION_USER_ID, 123456);
         contentValues.put(PackEntry.COLUMN_DESCRIPTION, "This is the description");
         contentValues.put(PackEntry.COLUMN_PACK_NAME, "India");
-        contentValues.put(PackEntry.COLUMN_PACK_PARENT_NAME, "World");
+        contentValues.put(PackEntry.COLUMN_PACK_PARENT_ID, 2);
         return contentValues;
     }
 
@@ -54,12 +53,10 @@ public class UtilityForTest {
 
     }
 
-    public static long insertSampleData(ContentValues contentValues, Context context) {
-        EnlightenDbHelper mOpenDbHelper = new EnlightenDbHelper(context);
-
-        SQLiteDatabase db = mOpenDbHelper.getWritableDatabase();
-        long insertId = db.insert(FriendEntry.TABLE_NAME, null, contentValues);
-
+    public static long insertSampleData(ContentValues contentValues, Context context, String tableName) {
+        final SQLiteDatabase db = new EnlightenDbHelper(context).getWritableDatabase();
+        long insertId = db.insert(tableName, null, contentValues);
         return insertId;
     }
+
 }
