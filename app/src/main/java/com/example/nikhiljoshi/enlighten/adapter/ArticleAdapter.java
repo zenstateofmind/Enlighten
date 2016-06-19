@@ -1,5 +1,6 @@
 package com.example.nikhiljoshi.enlighten.adapter;
 
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.data.ArticleInfo;
+import com.example.nikhiljoshi.enlighten.ui.Activity.LoadingActivity;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.tweetui.TweetView;
 
@@ -24,6 +26,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.Articles
     private static final String LOG_TAG = ArticleAdapter.class.getSimpleName();
 
     private List<Tweet> tweets;
+    private LoadingActivity activity;
+
+    public ArticleAdapter(LoadingActivity activity) {
+        this.activity = activity;
+    }
 
     @Override
     public ArticlesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -73,6 +80,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.Articles
         if (tweets == null) {
             tweets = new ArrayList<>();
         }
+
+        activity.stopLoadingDialogBox();
         tweets.addAll(freshTweets);
         for (Tweet tweet :
                 freshTweets) {

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 import com.example.nikhiljoshi.enlighten.data.EnlightenDbHelper;
+import com.example.nikhiljoshi.enlighten.pojo.Friend;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -233,6 +234,22 @@ public class EnlightenProvider extends ContentProvider {
                           PackEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ?" ,
                           new String[]{currentUserId + ""});
                 break;
+            } case PACK_WITH_CURRENT_USERID_AND_PACKID: {
+                final long currenUserId = PackEntry.getCurrentUserIdFromPackIdUri(uri);
+                final long packId = PackEntry.getPackIdFromPackIdUri(uri);
+                numRowsDeleted = db.delete(PackEntry.TABLE_NAME,
+                                            PackEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + PackEntry._ID + " = ? ",
+                                            new String[]{currenUserId + "", packId + ""});
+                break;
+
+            } case FRIENDS_WITH_CURRENT_USERID_AND_PACKID : {
+                final long currentUserId = FriendEntry.getCurrentUserIdFromPackUri(uri);
+                final long packId = FriendEntry.getPackIdFromPackUri(uri);
+                numRowsDeleted = db.delete(FriendEntry.TABLE_NAME,
+                        FriendEntry.COLUMN_CURRENT_SESSION_USER_ID + " = ? AND " + FriendEntry.COLUMN_PACK_KEY + " = ? ",
+                        new String[]{currentUserId + "", packId + ""});
+                break;
+
             } default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }

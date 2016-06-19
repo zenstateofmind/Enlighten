@@ -1,5 +1,6 @@
 package com.example.nikhiljoshi.enlighten.ui.Activity;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -11,7 +12,9 @@ import com.example.nikhiljoshi.enlighten.ui.Fragment.ArticlesFragment;
 /**
  * Created by nikhiljoshi on 6/8/16.
  */
-public class ArticleActivity extends AppCompatActivity {
+public class ArticleActivity extends AppCompatActivity implements LoadingActivity {
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,5 +52,18 @@ public class ArticleActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    @Override
+    public void startLoadingDialogBox() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading_tweets));
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+
+    @Override
+    public void stopLoadingDialogBox() {
+        progressDialog.dismiss();
     }
 }

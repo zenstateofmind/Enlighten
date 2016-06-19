@@ -14,6 +14,7 @@ import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.adapter.ArticleAdapter;
 import com.example.nikhiljoshi.enlighten.adapter.FriendAndPackAdapter;
 import com.example.nikhiljoshi.enlighten.network.MyTwitterApi;
+import com.example.nikhiljoshi.enlighten.ui.Activity.LoadingActivity;
 
 /**
  * Created by nikhiljoshi on 5/28/16.
@@ -32,11 +33,9 @@ public class ArticlesFragment extends Fragment {
         String userName = arguments.getString(FriendAndPackAdapter.USER_NAME);
         long userId = arguments.getLong(FriendAndPackAdapter.USER_ID);
 
-        ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setTitle(getActivity().getString(R.string.loading));
-        progressDialog.show();
+        ((LoadingActivity) getActivity()).startLoadingDialogBox();
 
-        mArticleAdapter = new ArticleAdapter();
+        mArticleAdapter = new ArticleAdapter((LoadingActivity)getActivity());
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.articles_recycle_view);
         mRecyclerView.setAdapter(mArticleAdapter);
         mRecyclerView.setHasFixedSize(true);

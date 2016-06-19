@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.Utility;
@@ -229,7 +230,9 @@ public class FriendAndPackAdapter extends RecyclerView.Adapter {
     }
 
 
-    public class PackViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class PackViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+        int numItemsLongClicked = 0;
 
         public TextView packName;
         public Pack pack;
@@ -253,5 +256,6 @@ public class FriendAndPackAdapter extends RecyclerView.Adapter {
             intent.putExtra(PackActivity.PARENT_PACK_ID_TAG, pack.parentPackId);
             mContext.startActivity(intent);
         }
+
     }
 }

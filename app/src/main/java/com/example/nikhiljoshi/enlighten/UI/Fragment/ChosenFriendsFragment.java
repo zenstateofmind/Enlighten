@@ -1,6 +1,7 @@
 package com.example.nikhiljoshi.enlighten.ui.Fragment;
 
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -26,6 +27,7 @@ import com.example.nikhiljoshi.enlighten.R;
 import com.example.nikhiljoshi.enlighten.adapter.FriendAndPackAdapter;
 import com.example.nikhiljoshi.enlighten.data.Contract.EnlightenContract;
 import com.example.nikhiljoshi.enlighten.pojo.Friend;
+import com.example.nikhiljoshi.enlighten.ui.Activity.MainActivity;
 import com.example.nikhiljoshi.enlighten.ui.Activity.SelectFriendsActivity;
 import com.twitter.sdk.android.Twitter;
 
@@ -79,6 +81,14 @@ public class ChosenFriendsFragment extends Fragment {
         if (packId != -1) {
             final MenuItem addFriendsOption = menu.findItem(R.id.add_friends);
             addFriendsOption.setTitle("Move friends to Pack");
+
+            final MenuItem addPackItem = menu.findItem(R.id.add_pack);
+            addPackItem.setVisible(false);
+            addPackItem.setEnabled(false);
+
+            final MenuItem deletePack = menu.findItem(R.id.delete_pack);
+            deletePack.setVisible(true);
+            deletePack.setEnabled(true);
         }
     }
 
@@ -98,10 +108,50 @@ public class ChosenFriendsFragment extends Fragment {
                 getActivity().finish();
                 getActivity().startActivity(intent);
                 return true;
-            }
-            default:
+            } case R.id.delete_pack: {
+                // ask if you want to delete for sure
+                // if so, first delete the pack with this pack id
+                //              delete the friends with this pack id
+                //                  go back to MainActivity
+                deletePack();
+            } default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void deletePack() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(getString(R.string.are_you_sure_about_deleting_packs))
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteInfoFromDb();
+                        getActivity().finish();
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builder.show();
+
+    }
+
+    private void deleteInfoFromDb() {
+        final long userId = Twitter.getSessionManager().getActiveSession().getUserId();
+        final Uri packUri = EnlightenContract.PackEntry.buildPackUriWithPackId(userId, packId);
+        final Uri friendUri = EnlightenContract.FriendEntry.buildUriWithCurrentUserIdAndPackId(userId, packId);
+
+        final ContentResolver contentResolver = getActivity().getContentResolver();
+        final int numRowsPackDeleted = contentResolver.delete(packUri, null, null);
+        final int numRowsFriendsDeleted = contentResolver.delete(friendUri, null, null);
+
+        Log.i(LOG_TAG, "Number of rows in pack deleted: " + numRowsPackDeleted + " " +
+                        " and number of rows in friends table deleted: " + numRowsFriendsDeleted);
     }
 
     /**

@@ -86,13 +86,15 @@ public class MyTwitterApi {
     private void getUserInfoFromIds(List<Long> friendIds, final FriendSelectionAdapter friendSelectionAdapter) {
 
         int numUsersPerRequest = 100;
-        // /users/lookup.json takes a max of 100 comma separated user ids
-        int numBatchesOfHunderFriendsEach = friendIds.size() / numUsersPerRequest;
+        // /users/lookup.json takes a max of 100 comma separated user ids. Add 1 to round
+        // it up. If you have 390 friends... you need to loop over 4 times, not 3!
+        int numBatchesOfHunderFriendsEach = (friendIds.size() / numUsersPerRequest) + 1;
         int startIndex = 0;
 
         for (int i = 0; i < numBatchesOfHunderFriendsEach; i++) {
-            int endIndex = friendIds.size() > numUsersPerRequest ? numUsersPerRequest : friendIds.size();
-            List<Long> subsetOfFriendIds = friendIds.subList(startIndex, endIndex + startIndex);
+            int endIndex = friendIds.size() > (numUsersPerRequest + startIndex) ? (numUsersPerRequest + startIndex)
+                                                                                : friendIds.size();
+            List<Long> subsetOfFriendIds = friendIds.subList(startIndex, endIndex);
 
             String commaSeparatedSubsetOfIds = TextUtils.join(",", subsetOfFriendIds);
             myTwitterApiClient.getUsersService().lookup(commaSeparatedSubsetOfIds, new Callback<List<User>>() {

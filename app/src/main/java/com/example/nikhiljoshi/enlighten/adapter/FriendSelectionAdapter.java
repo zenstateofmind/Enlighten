@@ -1,5 +1,6 @@
 package com.example.nikhiljoshi.enlighten.adapter;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -78,7 +79,7 @@ public class FriendSelectionAdapter extends RecyclerView.Adapter<FriendSelection
             } else {
                 setViewSettingsToNonSelectedUser(rootView);
             }
-            Picasso.with(profilePicture.getContext()).load(Utility.improveProfileImagePixel(user.profilePictureUrl))
+            Picasso.with(profilePicture.getContext()).load(Utility.improveProfileImagePixel(user.profilePictureUrl)).fit()
                     .into(profilePicture);
 
 
@@ -152,14 +153,21 @@ public class FriendSelectionAdapter extends RecyclerView.Adapter<FriendSelection
 
     public void loadAllFriendsFromDb(Long packId) {
 
+        if (friends == null) {
+            friends = new ArrayList<Friend>();
+        }
+
         List<Friend> friendsFromDb = new ArrayList<>();
+        final ContentResolver contentResolver = context.getContentResolver();
+
         long currentSessionUserId = Twitter.getSessionManager().getActiveSession().getUserId();
         Uri uriWithCurrentUserId = EnlightenContract.FriendEntry.buildFriendUriWithCurrentUserId(currentSessionUserId);
 
-        String selectionQuery = FriendEntry.COLUMN_PACK_KEY + " != ? OR " + FriendEntry.COLUMN_PACK_KEY + " IS NULL";
+        // Get all the friends from DB who are in other packs
+        String selectionQuery = FriendEntry.COLUMN_PACK_KEY + " != ? AND " + FriendEntry.COLUMN_PACK_KEY + " IS NOT NULL";
         String[] selectionArgs = new String[]{packId + ""};
 
-        Cursor cursor = context.getContentResolver().query(uriWithCurrentUserId, null, selectionQuery, selectionArgs, null);
+        Cursor cursor = contentResolver.query(uriWithCurrentUserId, null, selectionQuery, selectionArgs, null);
 
         if (!cursor.moveToFirst()) {
             Log.e(LOG_TAG, "The user hasn't chosen any friends! Weird... he should have chosen some.");
@@ -169,14 +177,31 @@ public class FriendSelectionAdapter extends RecyclerView.Adapter<FriendSelection
                 friendsFromDb.add(EnlightenContract.FriendEntry.convertToFriend(cursor));
             } while (cursor.moveToNext());
 
-            cursor.close();
-        }
-
-        if (friends == null) {
-            friends = new ArrayList<Friend>();
         }
 
         this.friends.addAll(0, friendsFromDb);
+
+        // Now get all the friends who are in base folder -- these are the ones that
+        // the user now wants to probably select into their pack. Hence show it up
+        // all the way at the top
+
+        friendsFromDb.clear();
+        selectionQuery = FriendEntry.COLUMN_PACK_KEY + " IS NULL";
+        cursor = contentResolver.query(uriWithCurrentUserId, null, selectionQuery, null, null);
+
+        if (!cursor.moveToFirst()) {
+            Log.e(LOG_TAG, "The user hasn't chosen any friends! Weird... he should have chosen some.");
+        } else {
+
+            do {
+                friendsFromDb.add(EnlightenContract.FriendEntry.convertToFriend(cursor));
+            } while (cursor.moveToNext());
+
+        }
+
+        this.friends.addAll(0, friendsFromDb);
+
+        cursor.close();
         notifyDataSetChanged();
 
     }
